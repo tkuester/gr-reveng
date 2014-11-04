@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<block>
+  <name>Pattern Dump</name>
+  <key>reveng_pattern_dump</key>
+  <category>reveng</category>
+  <import>import reveng</import>
+  <make>reveng.pattern_dump($pattern, $dump_len, $output_fmt, $rel_time)</make>
+
+  <param>
+    <name>Pattern</name>
+    <key>pattern</key>
+    <value>[0,1]*16</value>
+    <type>raw</type>
+  </param>
+
+  <param>
+    <name>Dump Length</name>
+    <key>dump_len</key>
+    <value>32</value>
+    <type>int</type>
+  </param>
+
+  <param>
+    <name>Output Format</name>
+    <key>output_fmt</key>
+    <value>%s,%{bits}</value>
+    <type>string</type>
+  </param>
+
+  <param>
+    <name>Time Reference</name>
+    <key>rel_time</key>
+    <type>enum</type>
+    <option>
+        <name>No Time</name>
+        <key>None</key>
+    </option>
+    <option>
+        <name>Relative</name>
+        <key>True</key>
+    </option>
+    <option>
+        <name>Absolute</name>
+        <key>False</key>
+    </option>
+  </param>
+
+  <sink>
+    <name>in</name>
+    <type>byte</type>
+  </sink>
+</block>
