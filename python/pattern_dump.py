@@ -75,7 +75,8 @@ class pattern_dump(gr.sync_block):
     rates.
     '''
     
-    def __init__(self, pattern, dump_len, output_fmt, rel_time=True):
+    def __init__(self, pattern, dump_len, output_fmt, rel_time=True,
+            file_name=None):
         gr.sync_block.__init__(self,
             name="pattern_dump",
             in_sig=[numpy.byte],
@@ -91,6 +92,17 @@ class pattern_dump(gr.sync_block):
         self.output_fmt = output_fmt
         self.rel_time = rel_time
 
+        self.fp = None
+        self.file_name = file_name
+
+        if self.file_name:
+            try:
+                self.fp = open(self.file_name, 'w')
+                print 'gr-reveng: Opened %s for output' % file_name
+            except (OSError, IOError) as e:
+                print "Couldn't open file for writing"
+                print str(e)
+
         self.start_time = datetime.now()
 
     def work(self, input_items, output_items):
@@ -100,7 +112,18 @@ class pattern_dump(gr.sync_block):
                 self.output.append(bit)
 
                 if len(self.output) == self.output.maxlen:
-                    print self.format_output(list(self.output))
+                    output = self.format_output(list(self.output))
+                    print output 
+
+                    if self.fp:
+                        try:
+                            self.fp.write(output + '\n')
+                            self.fp.flush()
+                        except IOError as e:
+                            print 'Error while writing to file:',
+                            print str(e)
+                            self.fp.close()
+                            self.fp = None
 
                     self.output.clear()
                     self.pattern_check.clear()
@@ -108,6 +131,12 @@ class pattern_dump(gr.sync_block):
                 self.pattern_check.append(bit)
 
         return len(input_items[0])
+
+    def stop(self):
+        if self.fp:
+            print "gr-reveng: Closing %s" % (self.file_name)
+            self.fp.close()
+            self.fp = None
 
     def format_output(self, bitarray):
         if self.rel_time == None:
@@ -137,7 +166,7 @@ class pattern_dump(gr.sync_block):
 def man_decode(bitarray):
     # TODO: Add differential, polarity options
     out = ''
-    for i in xrange(0, len(bitarray)/2, 2):
+    for i in xrange(0, len(bitarray)-1, 2):
         bits = bitarray[i:(i+2)]
         if bits == [0, 1]:
             out += '0'

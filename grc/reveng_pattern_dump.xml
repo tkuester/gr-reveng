@@ -4,7 +4,7 @@
   <key>reveng_pattern_dump</key>
   <category>reveng</category>
   <import>import reveng</import>
-  <make>reveng.pattern_dump($pattern, $dump_len, $output_fmt, $rel_time)</make>
+  <make>reveng.pattern_dump($pattern, $dump_len, $output_fmt, $rel_time, $file_name)</make>
 
   <param>
     <name>Pattern</name>
@@ -23,7 +23,7 @@
   <param>
     <name>Output Format</name>
     <key>output_fmt</key>
-    <value>%s,%{bits}</value>
+    <value>%s,%[bits]</value>
     <type>string</type>
   </param>
 
@@ -43,6 +43,13 @@
         <name>Absolute</name>
         <key>False</key>
     </option>
+  </param>
+
+  <param>
+    <name>File Output</name>
+    <key>file_name</key>
+    <value></value>
+    <type>string</type>
   </param>
 
   <sink>
