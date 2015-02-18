@@ -56,4 +56,9 @@
     <name>in</name>
     <type>byte</type>
   </sink>
+
+  <source>
+    <name>out</name>
+    <type>message</type>
+  </source>
 </block>

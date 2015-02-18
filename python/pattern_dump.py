@@ -22,6 +22,7 @@ import re
 from datetime import datetime
 import numpy
 from gnuradio import gr
+import pmt
 from collections import deque
 
 class pattern_dump(gr.sync_block):
@@ -105,6 +106,8 @@ class pattern_dump(gr.sync_block):
 
         self.start_time = datetime.now()
 
+        self.message_port_register_out(pmt.intern('out'))
+
     def work(self, input_items, output_items):
         in0 = input_items[0]
         for bit in in0:
@@ -112,8 +115,12 @@ class pattern_dump(gr.sync_block):
                 self.output.append(bit)
 
                 if len(self.output) == self.output.maxlen:
-                    output = self.format_output(list(self.output))
-                    print output 
+                    output = list(self.output)
+                    outs = ''.join(['1' if ch == 1 else '0' for ch in output])
+                    pmt_out = (None, outs)
+                    self.message_port_pub(pmt.intern('out'), pmt.to_pmt(pmt_out))
+                    output = self.format_output(output)
+                    print output
 
                     if self.fp:
                         try:
