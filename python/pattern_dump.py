@@ -77,7 +77,7 @@ class pattern_dump(gr.sync_block):
     '''
     
     def __init__(self, pattern, dump_len, output_fmt, rel_time=True,
-            file_name=None):
+            file_name=None, stdout=True):
         gr.sync_block.__init__(self,
             name="pattern_dump",
             in_sig=[numpy.byte],
@@ -95,6 +95,7 @@ class pattern_dump(gr.sync_block):
 
         self.fp = None
         self.file_name = file_name
+        self.stdout = stdout
 
         if self.file_name:
             try:
@@ -120,7 +121,9 @@ class pattern_dump(gr.sync_block):
                     pmt_out = (None, outs)
                     self.message_port_pub(pmt.intern('out'), pmt.to_pmt(pmt_out))
                     output = self.format_output(output)
-                    print output
+
+                    if self.stdout:
+                        print output
 
                     if self.fp:
                         try:
