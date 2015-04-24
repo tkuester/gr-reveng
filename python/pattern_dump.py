@@ -53,6 +53,7 @@ class pattern_dump(gr.sync_block):
      - %[hex] (ie: [0x55, 0x3f, ...]
      - %[ascii] (ie: \\xfeHello!)
      - %[man-bits] Manchester encoded bits
+     - %[pwm-bits] 100 = 1, 110 = 0
 
     Example: You are trying to capture a packet burst with the following
     format - [0x55, 0x55, 0x3e] + 14 bytes of manchester encoded data. You
@@ -163,15 +164,30 @@ class pattern_dump(gr.sync_block):
             tmp = ''.join([str(bit) for bit in bitarray])
             out = out.replace('%[bits]', tmp)
         if '%[hex]' in out:
-            tmp = ''.join([hex(byte)[2:] for byte in bites])
+            tmp = ''.join([hex(byte)[2:].zfill(2) for byte in bites])
             out = out.replace('%[hex]', tmp)
         if '%[ascii]' in out:
             tmp = repr(''.join([chr(c) for c in bites]))[1:-1]
             out = out.replace('%[ascii]', tmp)
         if '%[man-bits]' in out:
             out = out.replace('%[man-bits]', man_decode(bitarray))
+        if '%[pwm-bits]' in out:
+            out = out.replace('%[pwm-bits]', pwm_decode(bitarray))
 
         return out
+
+def pwm_decode(bitarray):
+    out = ''
+    for i in xrange(0, len(bitarray)-1, 3):
+        bits = bitarray[i:(i+3)]
+        if bits == [1, 0, 0]:
+            out += '1'
+        elif bits == [1, 1, 0]:
+            out += '0'
+        else:
+            out += 'x'
+
+    return out
             
 def man_decode(bitarray):
     # TODO: Add differential, polarity options
