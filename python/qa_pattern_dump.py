@@ -21,20 +21,55 @@
 
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
+import pmt
 from pattern_dump import pattern_dump
 
 class qa_pattern_dump(gr_unittest.TestCase):
 
     def setUp(self):
         self.tb = gr.top_block ()
+        self.dbg = blocks.message_debug()
 
     def tearDown(self):
         self.tb = None
 
-    def test_001_t(self):
-        # set up fg
-        self.tb.run ()
-        # check data
+    def get_matches(self, src_data, pattern, dump_len):
+        src = blocks.vector_source_b(src_data)
+        pd = pattern_dump(pattern, dump_len, "%[bits]", True, None, False)
+        self.tb.connect(src, pd)
+        self.tb.msg_connect(pd, "out", self.dbg, "store")
+        self.tb.run()
+        matches = [pmt.to_python(self.dbg.get_message(i))[1] for i in range(self.dbg.num_messages())]
+        return matches
+
+    def test_no_match(self):
+        src_data = [1,0,1,0,1,0,1,1,0,1,1,1,0,0,0,0,0]
+        pattern = [1,1,1,0,1]
+        matches = self.get_matches(src_data, pattern, 5)
+        self.assertEqual(len(matches), 0)
+
+    def test_single_match(self):
+        pattern = [1,0,1,0]
+        payload = [1,1,0,1,1]
+        src_data = [0]*3 + pattern + payload + [1]*3
+        matches = self.get_matches(src_data, pattern, len(payload))
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0], ''.join(map(str, payload)))
+
+    def test_multiple_matches(self):
+        pattern = [1,0,1,0]
+        payloads = [
+            [1,1,0,1,1],
+            [1,1,1,0,0],
+            [0,1,1,0,0]
+        ]
+        src_data = []
+        for i in range(len(payloads)):
+            src_data += [0]*3 + pattern + payloads[i] + [1]*3
+        matches = self.get_matches(src_data, pattern, len(payloads[0]))
+        self.assertEqual(len(matches), 3)
+        for i in range(len(payloads)):
+            self.assertEqual(matches[i], ''.join(map(str, payloads[i])))
 
 
 if __name__ == '__main__':
