@@ -42,10 +42,9 @@ if _RTLD_GLOBAL != 0:
 
 
 # import swig generated symbols into the reveng namespace
-#from reveng_swig import *
+from reveng_swig import *
 
 # import any pure python here
-from pattern_dump import pattern_dump
 #
 
 # ----------------------------------------------------------------
