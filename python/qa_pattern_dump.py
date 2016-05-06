@@ -22,7 +22,7 @@
 from gnuradio import gr, gr_unittest
 from gnuradio import blocks
 import pmt
-from pattern_dump import pattern_dump
+import reveng_swig as reveng
 
 class qa_pattern_dump(gr_unittest.TestCase):
 
@@ -35,7 +35,7 @@ class qa_pattern_dump(gr_unittest.TestCase):
 
     def get_matches(self, src_data, pattern, dump_len):
         src = blocks.vector_source_b(src_data)
-        pd = pattern_dump(pattern, dump_len, "%[bits]", True, None, False)
+        pd = reveng.pattern_dump(pattern, dump_len, "%[bits]", True, None, False)
         self.tb.connect(src, pd)
         self.tb.msg_connect(pd, "out", self.dbg, "store")
         self.tb.run()
