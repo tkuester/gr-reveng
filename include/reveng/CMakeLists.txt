@@ -22,5 +22,5 @@
 ########################################################################
 install(FILES
     api.h
-    DESTINATION include/reveng
+    pattern_dump.h DESTINATION include/reveng
 )
