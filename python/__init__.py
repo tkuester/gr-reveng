@@ -46,6 +46,7 @@ if _RTLD_GLOBAL != 0:
 
 # import any pure python here
 from pattern_dump import pattern_dump
+from repeat_detector import repeat_detector
 #
 
 # ----------------------------------------------------------------
