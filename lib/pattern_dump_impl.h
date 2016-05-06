@@ -22,6 +22,7 @@
 #ifndef INCLUDED_REVENG_PATTERN_DUMP_IMPL_H
 #define INCLUDED_REVENG_PATTERN_DUMP_IMPL_H
 
+#include <boost/dynamic_bitset.hpp>
 #include <reveng/pattern_dump.h>
 
 namespace gr {
@@ -30,7 +31,17 @@ namespace gr {
     class pattern_dump_impl : public pattern_dump
     {
      private:
-      // Nothing to declare in this block.
+      bool d_rel_time;
+      bool d_stdout;
+      pmt::pmt_t port_id = pmt::mp("out");
+      boost::dynamic_bitset<> d_pattern;
+      boost::dynamic_bitset<> d_pattern_check;
+      boost::dynamic_bitset<> d_output;
+
+      int d_pattern_check_len;
+      int d_output_len;
+
+      void shift_bit(boost::dynamic_bitset<> &bitset, bool bit);
 
      public:
       pattern_dump_impl(const std::vector<unsigned char> &pattern, unsigned int dump_len, const char *output_fmt, bool rel_time, const char *file_name, bool stdout);
