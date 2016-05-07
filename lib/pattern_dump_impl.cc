@@ -23,6 +23,8 @@
 #include "config.h"
 #endif
 
+#include <boost/algorithm/string/replace.hpp>
+#include <ctime>
 #include <gnuradio/io_signature.h>
 #include "pattern_dump_impl.h"
 
@@ -43,6 +45,7 @@ namespace gr {
       : gr::sync_block("pattern_dump",
               gr::io_signature::make(1, 1, sizeof(unsigned char)),
               gr::io_signature::make(0, 0, 0)),
+        d_output_fmt(output_fmt),
         d_rel_time(rel_time),
         d_stdout(stdout),
         d_pattern(pattern.size()),
@@ -80,13 +83,11 @@ namespace gr {
           d_output_len++;
 
           if (d_output_len == d_output.size()) {
-            std::string out;
-            boost::to_string(d_output, out);
-            auto msg = pmt::cons(pmt::PMT_NIL, pmt::intern(out));
+            auto msg = pmt::cons(pmt::PMT_NIL, pmt::intern(get_output_bit_string()));
             message_port_pub(port_id, msg);
 
             if (d_stdout)
-              std::cout << out << std::endl;
+              std::cout << format_output() << std::endl;
 
             d_output_len = 0;
             d_pattern_check_len = 0;
@@ -100,6 +101,25 @@ namespace gr {
 
       // Tell runtime system how many output items we produced.
       return noutput_items;
+    }
+
+    std::string
+    pattern_dump_impl::get_output_bit_string()
+    {
+      std::string out;
+      boost::to_string(d_output, out);
+      return out;
+    }
+
+    std::string
+    pattern_dump_impl::format_output()
+    {
+      std::time_t t = std::time(nullptr);
+      char buf[512];
+      std::strftime(buf, sizeof(buf), d_output_fmt.c_str(), std::localtime(&t));
+      auto out = std::string(buf);
+      boost::replace_all(out, "%[bits]", get_output_bit_string());
+      return out;
     }
 
     void

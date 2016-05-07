@@ -31,6 +31,7 @@ namespace gr {
     class pattern_dump_impl : public pattern_dump
     {
      private:
+      std::string d_output_fmt;
       bool d_rel_time;
       bool d_stdout;
       pmt::pmt_t port_id = pmt::mp("out");
@@ -41,6 +42,8 @@ namespace gr {
       int d_pattern_check_len;
       int d_output_len;
 
+      std::string get_output_bit_string();
+      std::string format_output();
       void shift_bit(boost::dynamic_bitset<> &bitset, bool bit);
 
      public:
