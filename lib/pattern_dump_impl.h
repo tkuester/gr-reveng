@@ -46,6 +46,7 @@ namespace gr {
       std::chrono::steady_clock::time_point d_start_time;
 
       std::string get_output_bit_string();
+      std::string get_output_hex_string();
       std::string format_output();
       void shift_bit(boost::dynamic_bitset<> &bitset, bool bit);
 

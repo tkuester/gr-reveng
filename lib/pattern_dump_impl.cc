@@ -118,6 +118,18 @@ namespace gr {
     }
 
     std::string
+    pattern_dump_impl::get_output_hex_string()
+    {
+      auto bitstring = get_output_bit_string();
+      std::stringstream ss;
+      ss << std::uppercase << std::setfill('0') << std::hex;
+      for (int i = 0; i < bitstring.length(); i += 8) {
+        ss << std::setw(2) << std::bitset<8>(bitstring.substr(i, 8)).to_ulong();
+      }
+      return ss.str();
+    }
+
+    std::string
     pattern_dump_impl::format_output()
     {
       std::time_t t = std::time(nullptr);
@@ -133,7 +145,9 @@ namespace gr {
         std::strftime(buf, sizeof(buf), d_output_fmt.c_str(), std::localtime(&t));
         out = std::string(buf);
       }
+
       boost::replace_all(out, "%[bits]", get_output_bit_string());
+      boost::replace_all(out, "%[hex]", get_output_hex_string());
       return out;
     }
 
