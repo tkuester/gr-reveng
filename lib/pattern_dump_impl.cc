@@ -69,6 +69,12 @@ namespace gr {
     {
     }
 
+    bool
+    pattern_dump_impl::start()
+    {
+      d_start_time = std::chrono::steady_clock::now();
+    }
+
     int
     pattern_dump_impl::work(int noutput_items,
         gr_vector_const_void_star &input_items,
@@ -115,9 +121,18 @@ namespace gr {
     pattern_dump_impl::format_output()
     {
       std::time_t t = std::time(nullptr);
-      char buf[512];
-      std::strftime(buf, sizeof(buf), d_output_fmt.c_str(), std::localtime(&t));
-      auto out = std::string(buf);
+      std::string out;
+      if (d_rel_time) {
+        out = d_output_fmt;
+        auto now = std::chrono::steady_clock::now();
+        std::chrono::duration<float> elapsed = now - d_start_time;
+        auto rel_time = elapsed.count();
+        boost::replace_all(out, "%s", std::to_string(rel_time));
+      } else {
+        char buf[512];
+        std::strftime(buf, sizeof(buf), d_output_fmt.c_str(), std::localtime(&t));
+        out = std::string(buf);
+      }
       boost::replace_all(out, "%[bits]", get_output_bit_string());
       return out;
     }
