@@ -24,6 +24,7 @@
 
 #include <boost/dynamic_bitset.hpp>
 #include <chrono>
+#include <cstdio>
 #include <reveng/pattern_dump.h>
 
 namespace gr {
@@ -43,6 +44,8 @@ namespace gr {
       int d_pattern_check_len;
       int d_output_len;
 
+      FILE *d_output_file = nullptr;
+
       std::chrono::steady_clock::time_point d_start_time;
 
       std::string get_output_bit_string();
@@ -56,12 +59,13 @@ namespace gr {
       pattern_dump_impl(const std::vector<unsigned char> &pattern, unsigned int dump_len, const char *output_fmt, bool rel_time, const char *file_name, bool stdout);
       ~pattern_dump_impl();
 
-      bool start();
+      bool start() override;
+      bool stop() override;
 
       // Where all the action really happens
       int work(int noutput_items,
          gr_vector_const_void_star &input_items,
-         gr_vector_void_star &output_items);
+         gr_vector_void_star &output_items) override;
     };
 
   } // namespace reveng

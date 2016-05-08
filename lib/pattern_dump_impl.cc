@@ -59,6 +59,14 @@ namespace gr {
       for (auto bit : pattern)
         d_pattern[i--] = bit;
 
+      if (strlen(file_name)) {
+        d_output_file = fopen(file_name, "w");
+        if (d_output_file)
+          std::cout << "gr-reveng: Opened " << file_name << " for output" << std::endl;
+        else
+          std::cout << "gr-reveng: Couldn't open file for writing" << std::endl;
+      }
+
       message_port_register_out(port_id);
     }
 
@@ -73,6 +81,17 @@ namespace gr {
     pattern_dump_impl::start()
     {
       d_start_time = std::chrono::steady_clock::now();
+      return true;
+    }
+
+    bool
+    pattern_dump_impl::stop()
+    {
+      if (d_output_file) {
+        std::cout << "gr-reveng: Closing output file" << std::endl;
+        fclose(d_output_file);
+      }
+      return true;
     }
 
     int
@@ -92,8 +111,16 @@ namespace gr {
             auto msg = pmt::cons(pmt::PMT_NIL, pmt::intern(get_output_bit_string()));
             message_port_pub(port_id, msg);
 
+            auto output = format_output();
             if (d_stdout)
-              std::cout << format_output() << std::endl;
+              std::cout << output << std::endl;
+
+            if (d_output_file) {
+              fputs(output.c_str(), d_output_file);
+              fputc('\n', d_output_file);
+              fflush(d_output_file);
+            }
+
 
             d_output_len = 0;
             d_pattern_check_len = 0;

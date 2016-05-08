@@ -47,7 +47,7 @@ namespace gr {
        * class. reveng::pattern_dump::make is the public interface for
        * creating new instances.
        */
-      static sptr make(const std::vector<unsigned char> &pattern, unsigned int dump_len, const char *output_fmt, bool rel_time = true, const char *file_name = 0, bool stdout = true);
+      static sptr make(const std::vector<unsigned char> &pattern, unsigned int dump_len, const char *output_fmt, bool rel_time = true, const char *file_name = "", bool stdout = true);
     };
 
   } // namespace reveng
