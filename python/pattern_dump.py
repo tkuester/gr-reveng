@@ -54,6 +54,7 @@ class pattern_dump(gr.sync_block):
      - %[ascii] (ie: \\xfeHello!)
      - %[man-bits] Manchester encoded bits
      - %[pwm-bits] 100 = 1, 110 = 0
+     - %[hdlcd] HDLC payload data, un-zero-stuffed and bit reversed, in hex
 
     Example: You are trying to capture a packet burst with the following
     format - [0x55, 0x55, 0x3e] + 14 bytes of manchester encoded data. You
@@ -173,6 +174,8 @@ class pattern_dump(gr.sync_block):
             out = out.replace('%[man-bits]', man_decode(bitarray))
         if '%[pwm-bits]' in out:
             out = out.replace('%[pwm-bits]', pwm_decode(bitarray))
+        if '%[hdlcd]' in out:
+            out = out.replace('%[hdlcd]', hdlc_data_decode(bitarray))
 
         return out
 
@@ -201,4 +204,26 @@ def man_decode(bitarray):
         else:
             out += 'x'
 
+    return out
+
+def hdlc_data_decode(bitarray):
+    out = ''
+    obyte = 0
+    bits = 0
+    ones = 0
+    for i in xrange(0, len(bitarray), 1):
+        if bitarray[i] == 0:
+            if ones != 5:
+                bits += 1
+            ones = 0
+        else:
+            obyte |= (1 << bits)
+            bits += 1
+            ones += 1
+            # TODO: ignoring too many ones in a row, for now.
+            # But we really ought to handle the HDLC 0x7e flag properly.
+        if bits == 8:
+            out += hex(obyte)[2:].zfill(2)
+            obyte = 0
+            bits = 0
     return out
