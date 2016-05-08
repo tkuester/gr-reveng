@@ -130,6 +130,23 @@ namespace gr {
     }
 
     std::string
+    pattern_dump_impl::get_output_man_string()
+    {
+      std::string out("");
+      auto bitstring = get_output_bit_string();
+      for (int i = 0; i < bitstring.length(); i += 2) {
+        auto symbol = bitstring.substr(i, 2);
+        if (symbol == "01")
+          out += "0";
+        else if (symbol == "10")
+          out += "1";
+        else
+          out += "x";
+      }
+      return out;
+    }
+
+    std::string
     pattern_dump_impl::get_output_pwm_string()
     {
       std::string out("");
@@ -165,6 +182,7 @@ namespace gr {
 
       boost::replace_all(out, "%[bits]", get_output_bit_string());
       boost::replace_all(out, "%[hex]", get_output_hex_string());
+      boost::replace_all(out, "%[man-bits]", get_output_man_string());
       boost::replace_all(out, "%[pwm-bits]", get_output_pwm_string());
       return out;
     }

@@ -47,6 +47,7 @@ namespace gr {
 
       std::string get_output_bit_string();
       std::string get_output_hex_string();
+      std::string get_output_man_string();
       std::string get_output_pwm_string();
       std::string format_output();
       void shift_bit(boost::dynamic_bitset<> &bitset, bool bit);
