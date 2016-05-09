@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<block>
+  <name>Repeat detector</name>
+  <key>reveng_repeat_detector</key>
+  <category>reveng</category>
+  <import>import reveng</import>
+  <make>reveng.repeat_detector()</make>
+  <sink>
+    <name>pdus</name>
+    <type>message</type>
+    <optional>1</optional>
+  </sink>
+</block>
