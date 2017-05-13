@@ -93,7 +93,7 @@ namespace gr {
                   pmt::pmt_t pdu, meta, data;
 
                   meta = pmt::make_dict();
-                  meta = pmt::dict_add(meta, pmt::mp("ts"), pmt::from_double(pkt_time.time_of_day().total_microseconds() / 1e6));
+                  meta = pmt::dict_add(meta, pmt::mp("ts"), pmt::from_long(pkt_time.time_of_day().total_microseconds()));
 
                   // FIXME: Does this not work in all cases?
                   data = pmt::make_blob((char *)&d_packet[0], d_packet.size());
