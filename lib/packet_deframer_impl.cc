@@ -24,6 +24,8 @@
 
 #include <iostream>
 #include <boost/circular_buffer.hpp>
+//#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <gnuradio/io_signature.h>
 #include "packet_deframer_impl.h"
 
@@ -83,7 +85,9 @@ namespace gr {
               if(d_pkt_idx == d_pkt_len)
               {
                   d_in_sync = false;
+                  boost::posix_time::ptime pkt_time = boost::posix_time::microsec_clock::universal_time();
 
+                  std::cout << "The time is: " << boost::posix_time::to_iso_extended_string(pkt_time) << std::endl;
                   std::cout << "Found a packet: [";
                   for(int j = 0; j < d_packet.size(); j++)
                       std::cout << (int)d_packet[j] << ", ";
