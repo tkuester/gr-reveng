@@ -50,6 +50,8 @@ namespace gr {
       d_in_sync(false),
       d_pkt_idx(0)
     {
+        message_port_register_out(pmt::mp("out"));
+
         // Match the size of the sync word
         d_sync = boost::circular_buffer<char>(sync.size());
         d_search = boost::circular_buffer<char>(sync.size());
@@ -85,14 +87,19 @@ namespace gr {
               if(d_pkt_idx == d_pkt_len)
               {
                   d_in_sync = false;
+
+                  // TODO: This is stupid, how do I get full unix time w/ microseconds? ._.
                   boost::posix_time::ptime pkt_time = boost::posix_time::microsec_clock::universal_time();
+                  pmt::pmt_t pdu, meta, data;
 
-                  std::cout << "The time is: " << boost::posix_time::to_iso_extended_string(pkt_time) << std::endl;
-                  std::cout << "Found a packet: [";
-                  for(int j = 0; j < d_packet.size(); j++)
-                      std::cout << (int)d_packet[j] << ", ";
+                  meta = pmt::make_dict();
+                  meta = pmt::dict_add(meta, pmt::mp("ts"), pmt::from_double(pkt_time.time_of_day().total_microseconds() / 1e6));
 
-                  std::cout << "]" << std::endl;
+                  // FIXME: Does this not work in all cases?
+                  data = pmt::make_blob((char *)&d_packet[0], d_packet.size());
+
+                  pdu = pmt::cons(meta, data);
+                  message_port_pub(pmt::mp("out"), pdu);
               }
           }
           else
