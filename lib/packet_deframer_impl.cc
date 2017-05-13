@@ -29,27 +29,29 @@
 #include <gnuradio/io_signature.h>
 #include "packet_deframer_impl.h"
 
+using namespace std;
+
 namespace gr {
   namespace reveng {
 
     packet_deframer::sptr
-    packet_deframer::make(const std::string &name, const std::vector<char> &sync, int pkt_len)
+    packet_deframer::make(const std::string &name, const std::vector<char> &sync, bool fixed_len, int pkt_len)
     {
       return gnuradio::get_initial_sptr
-        (new packet_deframer_impl(name, sync, pkt_len));
+        (new packet_deframer_impl(name, sync, fixed_len, pkt_len));
     }
 
     /*
      * The private constructor
      */
-    packet_deframer_impl::packet_deframer_impl(const std::string &name, const std::vector<char> &sync, int pkt_len)
+    packet_deframer_impl::packet_deframer_impl(const std::string &name, const std::vector<char> &sync, bool fixed_len, int pkt_len)
       : gr::sync_block("packet_deframer",
               gr::io_signature::make(1, 1, sizeof(char)),
               gr::io_signature::make(0, 0, 0)),
       d_name(name),
+      d_fixed_len(fixed_len),
       d_pkt_len(pkt_len),
-      d_in_sync(false),
-      d_pkt_idx(0)
+      d_in_sync(false)
     {
         message_port_register_out(pmt::mp("out"));
 
@@ -59,8 +61,6 @@ namespace gr {
 
         for(int i = 0; i < sync.size(); i++)
             d_sync.push_back(sync[i]);
-
-        d_packet.resize(pkt_len);
     }
 
     /*
@@ -68,6 +68,25 @@ namespace gr {
      */
     packet_deframer_impl::~packet_deframer_impl()
     {
+    }
+
+    void packet_deframer_impl::add_symbol(char symbol)
+    {
+        // Add bits onto buffer
+        d_packet.push_back(symbol);
+
+        if(!d_have_len)
+        {
+            d_pkt_len <<= 1;
+            d_pkt_len |= symbol;
+
+            if(d_packet.size() == 8)
+            {
+                d_pkt_len = (d_pkt_len + 1) * 8;
+                d_have_len = true;
+                d_packet.reserve(d_pkt_len);
+            }
+        }
     }
 
     int
@@ -80,12 +99,10 @@ namespace gr {
       {
           if(d_in_sync)
           {
-              // Add bits onto buffer
-              d_packet[d_pkt_idx] = in[i];
-              d_pkt_idx += 1;
+              add_symbol(in[i]);
 
               // Once we hit the end
-              if(d_pkt_idx == d_pkt_len)
+              if(d_have_len && (d_packet.size() >= d_pkt_len))
               {
                   d_in_sync = false;
 
@@ -111,11 +128,20 @@ namespace gr {
 
               // Check if we have sync.
               if(d_search == d_sync) {
-                  std::cout << "Yay found sync at idx: " << i << std::endl;
-
                   // TODO: More efficiently merge remaining (?) samples into d_packet
                   d_in_sync = true;
-                  d_pkt_idx = 0;
+                  d_packet.clear();
+
+                  if(d_fixed_len)
+                  {
+                      d_packet.reserve(d_pkt_len);
+                      d_have_len = true;
+                  }
+                  else
+                  {
+                      d_have_len = false;
+                      d_pkt_len = 0;
+                  }
               }
           }
       }

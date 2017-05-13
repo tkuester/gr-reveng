@@ -38,13 +38,16 @@ namespace gr {
       boost::circular_buffer<char> d_search;
       boost::circular_buffer<char> d_sync;
       bool d_in_sync;
+      bool d_fixed_len;
+      bool d_have_len;
 
       std::vector<char> d_packet;
       int d_pkt_len;
-      int d_pkt_idx;
+
+      void add_symbol(char symbol);
 
      public:
-      packet_deframer_impl(const std::string &name, const std::vector<char> &sync, int pkt_len);
+      packet_deframer_impl(const std::string &name, const std::vector<char> &sync, bool fixed_len, int pkt_len);
       ~packet_deframer_impl();
 
       // Where all the action really happens

@@ -4,12 +4,18 @@
   <key>reveng_packet_deframer</key>
   <category>reveng</category>
   <import>import reveng</import>
-  <make>reveng.packet_deframer($name, $sync, $pkt_len)</make>
+  <make>reveng.packet_deframer($name, $sync, $fixed_len, $pkt_len)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
        * key (makes the value accessible as $keyname, e.g. in the make node)
        * type -->
+
+  <param_tab_order>
+      <tab>General</tab>
+      <tab>Data Format</tab>
+  </param_tab_order>
+
   <param>
     <name>Name</name>
     <key>name</key>
@@ -26,10 +32,99 @@
   </param>
 
   <param>
+    <name>Mode</name>
+    <key>fixed_len</key>
+    <type>enum</type>
+    <option>
+        <name>Fixed Length</name>
+        <key>True</key>
+    </option>
+    <option>
+        <name>Variable Length</name>
+        <key>False</key>
+    </option>
+  </param>
+
+  <param>
     <name>Packet Len</name>
     <key>pkt_len</key>
     <value>32</value>
     <type>int</type>
+    <hide>#if str($fixed_len()).startswith('True') then 'none' else 'all'#</hide>
+  </param>
+
+  <param>
+    <name>Length Index</name>
+    <key>pkt_len_idx</key>
+    <value>0</value>
+    <type>int</type>
+    <hide>#if str($fixed_len()).startswith('True') then 'all' else 'none'#</hide>
+  </param>
+
+  <param>
+    <name>Encoding</name>
+    <key>encoding</key>
+    <type>enum</type>
+    <hide>#if ($encoding()).startswith('none') then 'part' else 'none'#</hide>
+    <option>
+        <name>None</name>
+        <key>none</key>
+    </option>
+    <!--option>
+        <name>Inverted</name>
+        <key>inv</key>
+    </option>
+    <option>
+        <name>Differential</name>
+        <key>diff</key>
+    </option>
+    <option>
+        <name>Manchester (01 => 1)</name>
+        <key>man_01</key>
+    </option>
+    <option>
+        <name>Manchester (10 => 1)</name>
+        <key>man_10</key>
+    </option>
+    <option>
+        <name>Differential Manchester</name>
+        <key>dman</key>
+    </option-->
+    <tab>Data Format</tab>
+  </param>
+
+  <param>
+    <name>MSB First</name>
+    <key>msb</key>
+    <value>True</value>
+    <type>enum</type>
+    <hide>part</hide>
+    <option>
+        <name>Yes</name>
+        <key>True</key>
+    </option>
+    <!--option>
+        <name>No</name>
+        <key>False</key>
+    </option-->
+    <tab>Data Format</tab>
+  </param>
+
+  <param>
+    <name>Endianness</name>
+    <key>big_endian</key>
+    <value>True</value>
+    <type>enum</type>
+    <hide>part</hide>
+    <option>
+        <name>Big Endian</name>
+        <key>True</key>
+    </option>
+    <!--option>
+        <name>Little Endian</name>
+        <key>False</key>
+    </option-->
+    <tab>Data Format</tab>
   </param>
 
   <!-- Make one 'sink' node per input. Sub-nodes:
