@@ -26,6 +26,7 @@ include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND reveng_sources
+    packet_deframer_impl.cc
 )
 
 set(reveng_sources "${reveng_sources}" PARENT_SCOPE)

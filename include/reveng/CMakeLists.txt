@@ -22,5 +22,5 @@
 ########################################################################
 install(FILES
     api.h
-    DESTINATION include/reveng
+    packet_deframer.h DESTINATION include/reveng
 )
