@@ -23,6 +23,7 @@
 #endif
 
 #include <iostream>
+#include <boost/circular_buffer.hpp>
 #include <gnuradio/io_signature.h>
 #include "packet_deframer_impl.h"
 
@@ -43,9 +44,18 @@ namespace gr {
       : gr::sync_block("packet_deframer",
               gr::io_signature::make(1, 1, sizeof(char)),
               gr::io_signature::make(0, 0, 0)),
-      d_sync(sync),
-      d_pkt_len(pkt_len)
+      d_pkt_len(pkt_len),
+      d_in_sync(false),
+      d_pkt_idx(0)
     {
+        // Match the size of the sync word
+        d_sync = boost::circular_buffer<char>(sync.size());
+        d_search = boost::circular_buffer<char>(sync.size());
+
+        for(int i = 0; i < sync.size(); i++)
+            d_sync.push_back(sync[i]);
+
+        d_packet.resize(pkt_len);
     }
 
     /*
@@ -61,17 +71,41 @@ namespace gr {
         gr_vector_void_star &output_items)
     {
       const char *in = (const char *) input_items[0];
-      int i;
-      std::cout << "I has a sync len: " << d_sync.size() << std::endl;
-      for(i = 0; i < d_sync.size(); i++)
-          std::cout << (int)d_sync[i] << ", ";
-      std::cout << std::endl;
-      std::cout << "Packet Len: " << d_pkt_len << std::endl;
-      /*
-      std::cout << "I got " << noutput_items << " items!" << std::endl;
-      for(i = 0; i < noutput_items; i++)
-          std::cout << i << " - " << (int)in[i] << std::endl;
-      */
+      for(int i = 0; i < noutput_items; i++)
+      {
+          if(d_in_sync)
+          {
+              // Add bits onto buffer
+              d_packet[d_pkt_idx] = in[i];
+              d_pkt_idx += 1;
+
+              // Once we hit the end
+              if(d_pkt_idx == d_pkt_len)
+              {
+                  d_in_sync = false;
+
+                  std::cout << "Found a packet: [";
+                  for(int j = 0; j < d_packet.size(); j++)
+                      std::cout << (int)d_packet[j] << ", ";
+
+                  std::cout << "]" << std::endl;
+              }
+          }
+          else
+          {
+              // Shift new bit onto search pattern
+              d_search.push_back(in[i]);
+
+              // Check if we have sync.
+              if(d_search == d_sync) {
+                  std::cout << "Yay found sync at idx: " << i << std::endl;
+
+                  // TODO: More efficiently merge remaining (?) samples into d_packet
+                  d_in_sync = true;
+                  d_pkt_idx = 0;
+              }
+          }
+      }
 
       // Tell runtime system how many output items we produced.
       return noutput_items;

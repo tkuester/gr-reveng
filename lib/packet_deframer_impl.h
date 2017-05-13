@@ -29,8 +29,17 @@ namespace gr {
     class packet_deframer_impl : public packet_deframer
     {
      private:
-      std::vector<char> d_sync;
+      // Circular buffers to hold sync word and search pattern
+      // NOTE: int64_t would be more efficient, but wouldn't let us (easily)
+      // search for symbols, and limits us to 64 bits. The trade off I suppose
+      // is efficiency in comparing d_search to d_sync
+      boost::circular_buffer<char> d_search;
+      boost::circular_buffer<char> d_sync;
+      bool d_in_sync;
+
+      std::vector<char> d_packet;
       int d_pkt_len;
+      int d_pkt_idx;
 
      public:
       packet_deframer_impl(const std::vector<char> &sync, int pkt_len);
