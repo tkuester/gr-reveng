@@ -33,19 +33,20 @@ namespace gr {
   namespace reveng {
 
     packet_deframer::sptr
-    packet_deframer::make(const std::vector<char> &sync, int pkt_len)
+    packet_deframer::make(const std::string &name, const std::vector<char> &sync, int pkt_len)
     {
       return gnuradio::get_initial_sptr
-        (new packet_deframer_impl(sync, pkt_len));
+        (new packet_deframer_impl(name, sync, pkt_len));
     }
 
     /*
      * The private constructor
      */
-    packet_deframer_impl::packet_deframer_impl(const std::vector<char> &sync, int pkt_len)
+    packet_deframer_impl::packet_deframer_impl(const std::string &name, const std::vector<char> &sync, int pkt_len)
       : gr::sync_block("packet_deframer",
               gr::io_signature::make(1, 1, sizeof(char)),
               gr::io_signature::make(0, 0, 0)),
+      d_name(name),
       d_pkt_len(pkt_len),
       d_in_sync(false),
       d_pkt_idx(0)
@@ -94,6 +95,7 @@ namespace gr {
 
                   meta = pmt::make_dict();
                   meta = pmt::dict_add(meta, pmt::mp("ts"), pmt::from_long(pkt_time.time_of_day().total_microseconds()));
+                  meta = pmt::dict_add(meta, pmt::mp("name"), pmt::intern(d_name));
 
                   // FIXME: Does this not work in all cases?
                   data = pmt::make_blob((char *)&d_packet[0], d_packet.size());

@@ -4,12 +4,20 @@
   <key>reveng_packet_deframer</key>
   <category>reveng</category>
   <import>import reveng</import>
-  <make>reveng.packet_deframer($sync, $pkt_len)</make>
+  <make>reveng.packet_deframer($name, $sync, $pkt_len)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
        * key (makes the value accessible as $keyname, e.g. in the make node)
        * type -->
+  <param>
+    <name>Name</name>
+    <key>name</key>
+    <value></value>
+    <type>string</type>
+    <hide>#if len($name()) > 0 then 'none' else 'part'#</hide>
+  </param>
+
   <param>
     <name>Sync Word</name>
     <key>sync</key>
@@ -20,7 +28,7 @@
   <param>
     <name>Packet Len</name>
     <key>pkt_len</key>
-    <value>3</value>
+    <value>32</value>
     <type>int</type>
   </param>
 
