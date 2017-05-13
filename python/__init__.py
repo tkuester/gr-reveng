@@ -23,33 +23,13 @@ This is the GNU Radio REVENG module. Place your Python package
 description here (python/__init__.py).
 '''
 
-# ----------------------------------------------------------------
-# Temporary workaround for ticket:181 (swig+python problem)
-import sys
-_RTLD_GLOBAL = 0
-try:
-    from dl import RTLD_GLOBAL as _RTLD_GLOBAL
-except ImportError:
-    try:
-	from DLFCN import RTLD_GLOBAL as _RTLD_GLOBAL
-    except ImportError:
-	pass
-
-if _RTLD_GLOBAL != 0:
-    _dlopenflags = sys.getdlopenflags()
-    sys.setdlopenflags(_dlopenflags|_RTLD_GLOBAL)
-# ----------------------------------------------------------------
-
-
 # import swig generated symbols into the reveng namespace
-#from reveng_swig import *
+try:
+	# this might fail if the module is python-only
+	from reveng_swig import *
+except ImportError:
+	pass
 
 # import any pure python here
 from pattern_dump import pattern_dump
 #
-
-# ----------------------------------------------------------------
-# Tail of workaround
-if _RTLD_GLOBAL != 0:
-    sys.setdlopenflags(_dlopenflags)      # Restore original flags
-# ----------------------------------------------------------------

@@ -1,23 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright 2014 <+YOU OR YOUR COMPANY+>.
-# 
+#
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3, or (at your option)
 # any later version.
-# 
+#
 # This software is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this software; see the file COPYING.  If not, write to
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
-# 
+#
 import re
 from datetime import datetime
 import numpy
@@ -28,8 +28,8 @@ from collections import deque
 class pattern_dump(gr.sync_block):
     '''
     Simple block to detect a pattern, and dump the next N bits for debug
-    purposes. 
-    
+    purposes.
+
     Often times, a packet structure will contain a fixed length "access code"
     or unique identifier that may be of interest. While it is possible to
     search through a dumped file, problems occur with bit and byte alignment.
@@ -59,7 +59,7 @@ class pattern_dump(gr.sync_block):
     Example: You are trying to capture a packet burst with the following
     format - [0x55, 0x55, 0x3e] + 14 bytes of manchester encoded data. You
     want to analyze two hours of captured traffic in a spreadsheet.
-     
+
     We will need to account for Manchester encoding in the dump_len parameter,
     since it doubles the data length. Keep in mind that a single bit error in
     the preamble and/or access code will cause the entire packet to be
@@ -69,7 +69,7 @@ class pattern_dump(gr.sync_block):
      - dump_len: 224 (ie: 14 bytes * 8 bits / byte * 2)
      - output_fmt: %s,%[man-bits]
      - rel_time: True
-    
+
     Notes:
     The only time format for relative time is %s, and represents the number of
     seconds since the start of processing
@@ -77,7 +77,7 @@ class pattern_dump(gr.sync_block):
     This is a python implementation, and may not preform well for high bit
     rates.
     '''
-    
+
     def __init__(self, pattern, dump_len, output_fmt, rel_time=True,
             file_name=None, stdout=True):
         gr.sync_block.__init__(self,
@@ -191,7 +191,7 @@ def pwm_decode(bitarray):
             out += 'x'
 
     return out
-            
+
 def man_decode(bitarray):
     # TODO: Add differential, polarity options
     out = ''
