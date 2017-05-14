@@ -110,7 +110,7 @@ Each bit is represented by an X's.
     </param>
     <param>
       <key>value</key>
-      <value>[ord('X')] * 8</value>
+      <value>[0,1] * 4</value>
     </param>
   </block>
   <block>
@@ -138,7 +138,7 @@ characters, and one C.</value>
     </param>
     <param>
       <key>value</key>
-      <value>[ord('B')]*((pktlen*8)-1) + [ord('C')]</value>
+      <value>[0]*((pktlen*8)-1) + [1]</value>
     </param>
   </block>
   <block>
@@ -349,7 +349,7 @@ a bit!</value>
     </param>
     <param>
       <key>_enabled</key>
-      <value>True</value>
+      <value>0</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -600,6 +600,41 @@ contents =
       <value>sync_word_bits</value>
     </param>
   </block>
+  <block>
+    <key>reveng_packet_formatter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>format_str</key>
+      <value>%(name),%(hex[0:32]), %(hex[32:40])\n%(hex)\n</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(968, 144)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>reveng_packet_formatter_0</value>
+    </param>
+  </block>
   <connection>
     <source_block_id>blocks_throttle_0</source_block_id>
     <sink_block_id>reveng_packet_deframer_0</sink_block_id>
@@ -617,5 +652,11 @@ contents =
     <sink_block_id>blocks_message_debug_0</sink_block_id>
     <source_key>out</source_key>
     <sink_key>print_pdu</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>reveng_packet_deframer_0</source_block_id>
+    <sink_block_id>reveng_packet_formatter_0</sink_block_id>
+    <source_key>out</source_key>
+    <sink_key>pdus</sink_key>
   </connection>
 </flow_graph>

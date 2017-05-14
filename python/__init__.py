@@ -32,4 +32,5 @@ except ImportError:
 
 # import any pure python here
 from pattern_dump import pattern_dump
+from packet_formatter import packet_formatter
 #

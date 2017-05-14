@@ -31,7 +31,8 @@ endif()
 GR_PYTHON_INSTALL(
     FILES
     __init__.py
-    pattern_dump.py DESTINATION ${GR_PYTHON_DIR}/reveng
+    pattern_dump.py
+    packet_formatter.py DESTINATION ${GR_PYTHON_DIR}/reveng
 )
 
 ########################################################################

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<block>
+  <name>Packet Formatter</name>
+  <key>reveng_packet_formatter</key>
+  <category>reveng</category>
+  <import>import reveng</import>
+  <make>reveng.packet_formatter($format_str)</make>
+  <!-- Make one 'param' node for every Parameter you want settable from the GUI.
+       Sub-nodes:
+       * name
+       * key (makes the value accessible as $keyname, e.g. in the make node)
+       * type -->
+  <param>
+      <name>Format String</name>
+      <key>format_str</key>
+      <type>string</type>
+  </param>
+
+  <!-- Make one 'sink' node per input. Sub-nodes:
+       * name (an identifier for the GUI)
+       * type
+       * vlen
+       * optional (set to 1 for optional inputs) -->
+  <sink>
+    <name>pdus</name>
+    <type>message</type>
+  </sink>
+</block>

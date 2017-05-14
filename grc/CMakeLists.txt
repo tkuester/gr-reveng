@@ -19,5 +19,6 @@
 
 install(FILES
     reveng_pattern_dump.xml
-    reveng_packet_deframer.xml DESTINATION share/gnuradio/grc/blocks
+    reveng_packet_deframer.xml
+    reveng_packet_formatter.xml DESTINATION share/gnuradio/grc/blocks
 )
