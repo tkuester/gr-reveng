@@ -46,7 +46,7 @@
   </param>
 
   <param>
-    <name>Packet Len</name>
+    <name>Pkt Len (bits)</name>
     <key>pkt_len</key>
     <value>32</value>
     <type>int</type>
@@ -54,7 +54,7 @@
   </param>
 
   <param>
-    <name>Length Index</name>
+    <name>Len Offset (bytes)</name>
     <key>pkt_len_idx</key>
     <value>0</value>
     <type>int</type>

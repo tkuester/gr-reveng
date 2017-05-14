@@ -93,6 +93,7 @@ namespace gr {
                 d_pkt_len |= symbol;
 
                 // When we have the full length byte
+                // TODO: Allow user to specify number of bits in length byte
                 if(d_packet.size() == (d_pkt_len_idx + 8))
                 {
                     // Account for the bits we've captured so far,
