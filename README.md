@@ -6,6 +6,10 @@ manually by searching through a file with a one-off python script, but that's
 tedious. This package contains a few blocks that should prove to be useful in
 deframing packets and displaying them on the screen.
 
+This software has been developed for GNU Radio 3.7.9, which ships with
+Ubuntu 16.04. It should work just as well with more recent versions.
+Please let me know what you have success with!
+
 **This software is still under development! The API is not guaranteed to
 be stable.**
 

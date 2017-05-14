@@ -27,9 +27,23 @@ import pmt
 from gnuradio import gr
 
 class packet_formatter(gr.basic_block):
-    """
-    docstring for block packet_formatter
-    """
+    '''
+    Simple block to format a PDU message to the screen.
+
+    Output Fmt Variables:
+     - TODO: Any python datetime format string (ie: %H:%M:%S)
+     - %(name)  - The name from the message
+     - %(bits)  - (ie: 10010110)
+     - %(hex)   - (ie: [0x55, 0x3f, ...]
+     - %(ascii) - (ie: \\xfeHello!)
+     - TODO: %[man-bits] Manchester encoded bits
+     - TODO: %[pwm-bits] 100 = 1, 110 = 0
+     - TODO: %[hdlcd] HDLC payload data, un-zero-stuffed and bit reversed, in hex
+
+    Format variables can be addressed. For example:
+       %(bits[3])
+       %(hex[0:32])
+    '''
     def __init__(self, format_str):
         gr.basic_block.__init__(self,
             name="packet_formatter",
@@ -42,11 +56,14 @@ class packet_formatter(gr.basic_block):
         self.format_str = format_str
         self.fp = None
 
+    '''
     def stop(self):
+        TODO: Log to file
         if self.fp:
             print "gr-reveng: Closing %s" % (self.file_name)
             self.fp.close()
             self.fp = None
+    '''
 
     def handle_pdu(self, pdu):
         if not pmt.is_pair(pdu):
@@ -69,6 +86,7 @@ class packet_formatter(gr.basic_block):
 
     def format_output(self, meta, bits):
         '''
+        TODO: Pull in TS from PDU
         if self.rel_time == None:
             out = self.format_str
         elif self.rel_time == True:

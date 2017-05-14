@@ -27,6 +27,8 @@ from collections import deque
 
 class pattern_dump(gr.sync_block):
     '''
+    THIS BLOCK HAS BEEN DEPRECATED!
+
     Simple block to detect a pattern, and dump the next N bits for debug
     purposes.
 

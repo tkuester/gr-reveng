@@ -349,11 +349,11 @@ a bit!</value>
     </param>
     <param>
       <key>_enabled</key>
-      <value>0</value>
+      <value>1</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1008, 73)</value>
+      <value>(1000, 17)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -608,7 +608,7 @@ contents =
     </param>
     <param>
       <key>comment</key>
-      <value></value>
+      <value>The new Packet Formatter object!</value>
     </param>
     <param>
       <key>affinity</key>
@@ -620,11 +620,11 @@ contents =
     </param>
     <param>
       <key>format_str</key>
-      <value>%(name),%(hex[0:32]), %(hex[32:40])\n%(hex)\n</value>
+      <value>%(name)\ntransmitter_id: %(hex[0:32])\nPacket Length: %(hex[32:40])\nFull Packet: %(hex)\n</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(968, 144)</value>
+      <value>(1000, 188)</value>
     </param>
     <param>
       <key>_rotation</key>
