@@ -19,8 +19,9 @@
     <param>
       <key>comment</key>
       <value>This flowgraph builds a simple packet, and sends
-it through the Deframer. Test your understanding
-of how it works by changing the packet structure!</value>
+it through the Deframer. Try modifying the
+packet structure and parameters to test your
+understanding of how the deframer works!</value>
     </param>
     <param>
       <key>description</key>
@@ -475,6 +476,53 @@ a bit!</value>
     <param>
       <key>vector</key>
       <value>sync_word_bits + transmitter_id_bits + pktlen_bits + msg + csum_bits + [0]*10000</value>
+    </param>
+  </block>
+  <block>
+    <key>note</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value>* MESSAGE DEBUG PRINT PDU VERBOSE *
+((name . RevengTestSrc) (ts . 6937513679))
+pdu_length = 128
+contents = 
+0000: 01 01 00 01 01 01 01 00 01 00 01 00 01 01 00 01 
+0010: 01 00 01 01 01 01 01 00 01 01 01 00 01 01 01 01 
+0020: 00 00 00 00 01 00 01 00 42 42 42 42 42 42 42 42 
+0030: 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
+0040: 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
+0050: 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
+0060: 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
+0070: 42 42 42 42 42 42 42 43 58 58 58 58 58 58 58 58 
+***********************************
+
+0000 - 0010: 0xdeadbeef, in bit form
+0020: The length byte, and the start of the message
+0070: The end of the message, and the checksum</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(744, 412)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>note_0</value>
+    </param>
+    <param>
+      <key>note</key>
+      <value></value>
     </param>
   </block>
   <block>
