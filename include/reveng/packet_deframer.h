@@ -49,7 +49,8 @@ namespace gr {
        * class. reveng::packet_deframer::make is the public interface for
        * creating new instances.
        */
-      static sptr make(const std::string &name, const std::vector<char> &sync, bool fixed_len, int pkt_len);
+      static sptr make(const std::string &name, const std::vector<char> &sync,
+              bool fixed_len, int pkt_len, int pkt_len_idx, int pkt_len_adtl);
     };
 
   } // namespace reveng

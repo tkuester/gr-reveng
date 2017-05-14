@@ -4,7 +4,7 @@
   <key>reveng_packet_deframer</key>
   <category>reveng</category>
   <import>import reveng</import>
-  <make>reveng.packet_deframer($name, $sync, $fixed_len, $pkt_len)</make>
+  <make>reveng.packet_deframer($name, $sync, $fixed_len, $pkt_len, $pkt_len_idx, $pkt_len_adtl)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
@@ -59,6 +59,14 @@
     <value>0</value>
     <type>int</type>
     <hide>#if str($fixed_len()).startswith('True') then 'all' else 'none'#</hide>
+  </param>
+
+  <param>
+    <name>Additional Bytes</name>
+    <key>pkt_len_adtl</key>
+    <value>0</value>
+    <type>int</type>
+    <hide>$(((str($fixed_len()).startswith('False')) and (($pkt_len_adtl() > 0) and 'none' or 'part')) or 'all')</hide>
   </param>
 
   <param>

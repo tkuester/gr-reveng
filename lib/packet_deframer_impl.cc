@@ -35,22 +35,26 @@ namespace gr {
   namespace reveng {
 
     packet_deframer::sptr
-    packet_deframer::make(const std::string &name, const std::vector<char> &sync, bool fixed_len, int pkt_len)
+    packet_deframer::make(const std::string &name, const std::vector<char> &sync, bool fixed_len,
+            int pkt_len, int pkt_len_idx, int pkt_len_adtl)
     {
       return gnuradio::get_initial_sptr
-        (new packet_deframer_impl(name, sync, fixed_len, pkt_len));
+        (new packet_deframer_impl(name, sync, fixed_len,
+                                  pkt_len, pkt_len_idx, pkt_len_adtl));
     }
 
     /*
      * The private constructor
      */
-    packet_deframer_impl::packet_deframer_impl(const std::string &name, const std::vector<char> &sync, bool fixed_len, int pkt_len)
+    packet_deframer_impl::packet_deframer_impl(const std::string &name, const std::vector<char> &sync,
+            bool fixed_len, int pkt_len, int pkt_len_idx, int pkt_len_adtl)
       : gr::sync_block("packet_deframer",
               gr::io_signature::make(1, 1, sizeof(char)),
               gr::io_signature::make(0, 0, 0)),
       d_name(name),
       d_fixed_len(fixed_len),
       d_pkt_len(pkt_len),
+      d_pkt_len_adtl(pkt_len_adtl),
       d_in_sync(false)
     {
         message_port_register_out(pmt::mp("out"));
@@ -58,6 +62,7 @@ namespace gr {
         // Match the size of the sync word
         d_sync = boost::circular_buffer<char>(sync.size());
         d_search = boost::circular_buffer<char>(sync.size());
+        d_pkt_len_idx = pkt_len_idx * 8;
 
         for(int i = 0; i < sync.size(); i++)
             d_sync.push_back(sync[i]);
@@ -70,21 +75,32 @@ namespace gr {
     {
     }
 
+    // FIXME: Indicate what's counting bytes, what's counting bits
+
     void packet_deframer_impl::add_symbol(char symbol)
     {
         // Add bits onto buffer
         d_packet.push_back(symbol);
 
+        // If we don't have the length
         if(!d_have_len)
         {
-            d_pkt_len <<= 1;
-            d_pkt_len |= symbol;
-
-            if(d_packet.size() == 8)
+            // Wait until we're at the beginning of the length byte
+            if(d_packet.size() > d_pkt_len_idx)
             {
-                d_pkt_len = (d_pkt_len + 1) * 8;
-                d_have_len = true;
-                d_packet.reserve(d_pkt_len);
+                // Shift onto the length
+                d_pkt_len <<= 1;
+                d_pkt_len |= symbol;
+
+                // When we have the full length byte
+                if(d_packet.size() == (d_pkt_len_idx + 8))
+                {
+                    // Account for the bits we've captured so far,
+                    // plus the remaining length
+                    d_pkt_len = d_packet.size() + (d_pkt_len * 8) + (d_pkt_len_adtl * 8);
+                    d_have_len = true;
+                    d_packet.reserve(d_pkt_len);
+                }
             }
         }
     }
