@@ -6,7 +6,8 @@ manually by searching through a file with a one-off python script, but that's
 tedious. This package contains a few blocks that should prove to be useful in
 deframing packets and displaying them on the screen.
 
-**This software is still under development!**
+**This software is still under development! The API is not guaranteed to
+be stable.**
 
 ## Packet Deframer
 
@@ -38,12 +39,12 @@ The following parameters apply to all use cases.
 
 #### Fixed Length Parameters
 
-* **Packet Len**: The number of bits to grab for the packet
+* **Packet Len**: The number of **bits** to grab after the `sync_word`
 
 #### Variable Length Parameters
 
-* **Packet Len Offset**: The number of bytes that come before the packet length
-* **Additional Bytes**: The number of bytes to capture in addition to the given length, in the event the packet length does not include the checksum
+* **Packet Len Offset**: The number of **bytes** that come before the packet length. Some radios send a `transmitter_id`, which comes before the length byte.
+* **Additional Bytes**: The number of **bytes** to capture in addition to the given length, in the event the packet length does not include the checksum
 
 ## Future Work
 * Specify checksum algorithm *à la* `python-crcmod`
