@@ -1,8 +1,12 @@
+# gr-reveng
+
 Often times, when reverse engineering an RF protocol, you will be looking for
 a particular pattern to signify the start of a packet. This can be done
 manually by searching through a file with a one-off python script, but that's
 tedious. This package contains a few blocks that should prove to be useful in
 deframing packets and displaying them on the screen.
+
+**This software is still under development!**
 
 ## Packet Deframer
 
@@ -46,3 +50,4 @@ The following parameters apply to all use cases.
 * Currently, packet length must be 8 bytes. Accommodate for 16 bit lengths
 * Endian-ness and MSB/LSB first, esp. for variable length packets
 * Option to pack bits into bytes
+* Write some test cases >_>
