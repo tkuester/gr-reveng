@@ -18,11 +18,9 @@
     </param>
     <param>
       <key>comment</key>
-      <value>This must be run from the cmdline.
-Try adding and removing components to
-test your understanding of the packet block.
-The last data bit is a 'C', if you see it, then you
-captured the data portion correctly!</value>
+      <value>This flowgraph builds a simple packet, and sends
+it through the Deframer. Test your understanding
+of how it works by changing the packet structure!</value>
     </param>
     <param>
       <key>description</key>
@@ -34,7 +32,7 @@ captured the data portion correctly!</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 8)</value>
+      <value>(8, 13)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -42,7 +40,7 @@ captured the data portion correctly!</value>
     </param>
     <param>
       <key>generate_options</key>
-      <value>no_gui</value>
+      <value>qt_gui</value>
     </param>
     <param>
       <key>hier_block_src_path</key>
@@ -90,7 +88,8 @@ captured the data portion correctly!</value>
     <param>
       <key>comment</key>
       <value>A one byte checksum, not included in the length.
-Represented by X's.</value>
+Each bit is represented by an X's.
+(reveng works with symbols!)</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -106,66 +105,11 @@ Represented by X's.</value>
     </param>
     <param>
       <key>id</key>
-      <value>csum</value>
+      <value>csum_bits</value>
     </param>
     <param>
       <key>value</key>
       <value>[ord('X')] * 8</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value>Represents the transmitter ID.
-Using A to represent the bits.</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(8, 301)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>host_id</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>[ord('A')] * 16</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value>The length byte, converted into bits</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(328, 301)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>len_bits</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>map(int, bin(pktlen )[2:].zfill(8))</value>
     </param>
   </block>
   <block>
@@ -228,6 +172,33 @@ data section.</value>
     <key>variable</key>
     <param>
       <key>comment</key>
+      <value>The length byte, converted into bits</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(328, 301)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>pktlen_bits</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>map(int, bin(pktlen )[2:].zfill(8))</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
       <value></value>
     </param>
     <param>
@@ -236,7 +207,7 @@ data section.</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(192, 13)</value>
+      <value>(184, 13)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -249,6 +220,33 @@ data section.</value>
     <param>
       <key>value</key>
       <value>32000</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value>ChipCon likes 0xd391!</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(744, 197)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>sync_word</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0xd391</value>
     </param>
   </block>
   <block>
@@ -271,11 +269,66 @@ data section.</value>
     </param>
     <param>
       <key>id</key>
-      <value>sync_word</value>
+      <value>sync_word_bits</value>
     </param>
     <param>
       <key>value</key>
-      <value>map(int, bin(0xd391)[2:].zfill(16))</value>
+      <value>map(int, bin(sync_word)[2:].zfill(16))</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value>The transmitter ID is 0xdeadbeef</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(744, 301)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>transmitter_id</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0xdeadbeef</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value>Represents the transmitter ID.
+Using A to represent the bits.</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(8, 301)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>transmitter_id_bits</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>map(int, bin(transmitter_id)[2:].zfill(32))</value>
     </param>
   </block>
   <block>
@@ -286,7 +339,8 @@ data section.</value>
     </param>
     <param>
       <key>comment</key>
-      <value></value>
+      <value>Remember, each "byte" on screen is actually
+a bit!</value>
     </param>
     <param>
       <key>affinity</key>
@@ -298,7 +352,7 @@ data section.</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(952, 81)</value>
+      <value>(1008, 73)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -372,7 +426,7 @@ data section.</value>
     </param>
     <param>
       <key>comment</key>
-      <value></value>
+      <value>Modify the packet structure here!</value>
     </param>
     <param>
       <key>affinity</key>
@@ -420,14 +474,14 @@ data section.</value>
     </param>
     <param>
       <key>vector</key>
-      <value>sync_word + host_id + len_bits + msg + csum + [0]*10000</value>
+      <value>sync_word_bits + transmitter_id_bits + pktlen_bits + msg + csum_bits + [0]*10000</value>
     </param>
   </block>
   <block>
     <key>reveng_packet_deframer</key>
     <param>
       <key>pkt_len_adtl</key>
-      <value>1</value>
+      <value>len(csum_bits)/8</value>
     </param>
     <param>
       <key>alias</key>
@@ -455,7 +509,7 @@ data section.</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(736, 55)</value>
+      <value>(736, 48)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -467,7 +521,7 @@ data section.</value>
     </param>
     <param>
       <key>pkt_len_idx</key>
-      <value>2</value>
+      <value>len(transmitter_id_bits)/8</value>
     </param>
     <param>
       <key>msb</key>
@@ -495,7 +549,7 @@ data section.</value>
     </param>
     <param>
       <key>sync</key>
-      <value>sync_word</value>
+      <value>sync_word_bits</value>
     </param>
   </block>
   <connection>
@@ -514,6 +568,6 @@ data section.</value>
     <source_block_id>reveng_packet_deframer_0</source_block_id>
     <sink_block_id>blocks_message_debug_0</sink_block_id>
     <source_key>out</source_key>
-    <sink_key>print</sink_key>
+    <sink_key>print_pdu</sink_key>
   </connection>
 </flow_graph>
