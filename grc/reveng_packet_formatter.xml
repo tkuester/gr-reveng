@@ -4,16 +4,67 @@
   <key>reveng_packet_formatter</key>
   <category>reveng</category>
   <import>import reveng</import>
-  <make>reveng.packet_formatter($format_str)</make>
+  <make>reveng.packet_formatter(format_str=$format_str, file_name=$file_name, log_to=$log_to, append=$append)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
        * key (makes the value accessible as $keyname, e.g. in the make node)
        * type -->
+  <param_tab_order>
+      <tab>Formatting</tab>
+      <tab>Logging</tab>
+  </param_tab_order>
+
   <param>
       <name>Format String</name>
       <key>format_str</key>
       <type>string</type>
+  </param>
+
+  <param>
+      <name>File Name</name>
+      <key>file_name</key>
+      <type>string</type>
+      <hide>#if len($file_name()) > 0 then 'none' else 'part'#</hide>
+      <tab>Logging</tab>
+  </param>
+
+  <param>
+    <name>Options</name>
+    <key>log_to</key>
+    <value>stdout</value>
+    <type>enum</type>
+    <hide>part</hide>
+    <option>
+        <name>stdout</name>
+        <key>"stdout"</key>
+    </option>
+    <option>
+        <name>File</name>
+        <key>"file"</key>
+    </option>
+    <option>
+        <name>stdout + File</name>
+        <key>"stdout_file"</key>
+    </option>
+    <tab>Logging</tab>
+  </param>
+
+  <param>
+    <name>Append</name>
+    <key>append</key>
+    <value>False</value>
+    <type>enum</type>
+    <hide>part</hide>
+    <option>
+        <name>True</name>
+        <key>True</key>
+    </option>
+    <option>
+        <name>False</name>
+        <key>False</key>
+    </option>
+    <tab>Logging</tab>
   </param>
 
   <!-- Make one 'sink' node per input. Sub-nodes:

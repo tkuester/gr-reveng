@@ -44,7 +44,7 @@ class packet_formatter(gr.basic_block):
        %(bits[3])
        %(hex[0:32])
     '''
-    def __init__(self, format_str):
+    def __init__(self, format_str, file_name=None, log_to='stdout', append=False):
         gr.basic_block.__init__(self,
             name="packet_formatter",
             in_sig=None,
@@ -54,16 +54,21 @@ class packet_formatter(gr.basic_block):
         self.set_msg_handler(pmt.intern('pdus'), self.handle_pdu)
 
         self.format_str = format_str
+        self.file_name = file_name
         self.fp = None
 
-    '''
+        self.stdout = 'stdout' in log_to
+        if log_to in ['file', 'stdout_file']:
+            try:
+                self.fp = open(file_name, 'a' if append else 'w')
+            except (OSError, IOError):
+                print >> sys.stderr, "gr-reveng: Unable to open '%s' for writing" % file_name
+
     def stop(self):
-        TODO: Log to file
         if self.fp:
-            print "gr-reveng: Closing %s" % (self.file_name)
+            print >> sys.stderr, "gr-reveng: Closing %s" % (self.file_name)
             self.fp.close()
             self.fp = None
-    '''
 
     def handle_pdu(self, pdu):
         if not pmt.is_pair(pdu):
@@ -73,15 +78,27 @@ class packet_formatter(gr.basic_block):
         bits = pmt.to_python(pmt.cdr(pdu))
 
         try:
-            print self.format_output(meta, bits)
+            output = self.format_output(meta, bits)
+            if self.stdout:
+                print output
+            if self.fp:
+                self.fp.write(output)
+                self.fp.write('\n')
         except IndexError as e:
-            print >> sys.stderr, "IndexError: Ran out of bits?"
+            print >> sys.stderr, "gr-reveng: IndexError: Ran out of bits?"
             print >> sys.stderr, traceback.format_exc(e)
         except ValueError as e:
-            print >> sys.stderr, "TypeError: Something casted wrong!"
+            print >> sys.stderr, "gr-reveng: TypeError: Something casted wrong!"
             print >> sys.stderr, traceback.format_exc(e)
+        except IOError as e:
+            print >> sys.stderr, "gr-reveng: IOError: Unable to write to file, closing"
+            try:
+                self.fp.close()
+            except (OSError, IOError):
+                pass
+            self.fp = None
         except StandardError as e:
-            print >> sys.stderr, "%s: Something went horribly wrong!" % type(e)
+            print >> sys.stderr, "gr-reveng: %s: Something went horribly wrong!" % type(e)
             print >> sys.stderr, traceback.format_exc(e)
 
     def format_output(self, meta, bits):
