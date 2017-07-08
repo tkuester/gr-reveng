@@ -65,10 +65,17 @@ class packet_formatter(gr.basic_block):
                 print >> sys.stderr, "gr-reveng: Unable to open '%s' for writing" % file_name
 
     def stop(self):
-        if self.fp:
-            print >> sys.stderr, "gr-reveng: Closing %s" % (self.file_name)
+        if not self.fp:
+            return
+
+        print >> sys.stderr, "gr-reveng: Closing %s" % (self.file_name)
+        try:
             self.fp.close()
-            self.fp = None
+        except (OSError, IOError):
+            pass
+        self.fp = None
+
+        return True
 
     def handle_pdu(self, pdu):
         if not pmt.is_pair(pdu):
@@ -146,6 +153,8 @@ class packet_formatter(gr.basic_block):
 
             if tipe == 'name':
                 tmp = meta.get('name', "None")
+            if tipe == 'ts':
+                tmp = str(meta.get('ts', "None"))
             elif tipe == 'bits':
                 tmp = ''.join(map(str, sub_bits))
             elif tipe == 'hex':

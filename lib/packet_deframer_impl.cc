@@ -23,9 +23,9 @@
 #endif
 
 #include <iostream>
+#include <sys/time.h>
+
 #include <boost/circular_buffer.hpp>
-//#include <boost/date_time/posix_time/posix_time_types.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <gnuradio/io_signature.h>
 #include "packet_deframer_impl.h"
 
@@ -123,13 +123,21 @@ namespace gr {
               {
                   d_in_sync = false;
 
-                  // TODO: This is stupid, how do I get full unix time w/ microseconds? ._.
                   boost::posix_time::ptime pkt_time = boost::posix_time::microsec_clock::universal_time();
                   pmt::pmt_t pdu, meta, data;
 
                   meta = pmt::make_dict();
-                  meta = pmt::dict_add(meta, pmt::mp("ts"), pmt::from_long(pkt_time.time_of_day().total_microseconds()));
                   meta = pmt::dict_add(meta, pmt::mp("name"), pmt::intern(d_name));
+
+                  // TODO: Pull the timestamp from the stream tags, if possible.
+                  // Real time doesn't necessarily correspond to when we rx the samp buffer
+                  struct timeval tv;
+                  if(gettimeofday(&tv, NULL) == 0) {
+                      double ts = tv.tv_sec + (tv.tv_usec / 100000.0);
+                      meta = pmt::dict_add(meta, pmt::mp("ts"), pmt::from_double(ts));
+                  } else {
+                      meta = pmt::dict_add(meta, pmt::mp("ts"), pmt::from_double(-1));
+                  }
 
                   // FIXME: Does this not work in all cases?
                   data = pmt::make_blob((char *)&d_packet[0], d_packet.size());
