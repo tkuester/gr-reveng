@@ -19,6 +19,7 @@
 # Boston, MA 02110-1301, USA.
 # 
 
+import time
 import sys
 import traceback
 import re
@@ -44,7 +45,7 @@ class packet_formatter(gr.basic_block):
        %(bits[3])
        %(hex[0:32])
     '''
-    def __init__(self, format_str, file_name=None, log_to='stdout', append=False):
+    def __init__(self, format_str, file_name=None, log_to='stdout', append=False, flush=True):
         gr.basic_block.__init__(self,
             name="packet_formatter",
             in_sig=None,
@@ -56,6 +57,7 @@ class packet_formatter(gr.basic_block):
         self.format_str = format_str
         self.file_name = file_name
         self.fp = None
+        self.flush = flush
 
         self.stdout = 'stdout' in log_to
         if log_to in ['file', 'stdout_file']:
@@ -91,6 +93,8 @@ class packet_formatter(gr.basic_block):
             if self.fp:
                 self.fp.write(output)
                 self.fp.write('\n')
+                if self.flush:
+                    self.fp.flush()
         except IndexError as e:
             print >> sys.stderr, "gr-reveng: IndexError: Ran out of bits?"
             print >> sys.stderr, traceback.format_exc(e)
@@ -153,8 +157,8 @@ class packet_formatter(gr.basic_block):
 
             if tipe == 'name':
                 tmp = meta.get('name', "None")
-            if tipe == 'ts':
-                tmp = str(meta.get('ts', "None"))
+            elif tipe == 'ts':
+                tmp = '%.6f' % meta.get('ts', -1)
             elif tipe == 'bits':
                 tmp = ''.join(map(str, sub_bits))
             elif tipe == 'hex':

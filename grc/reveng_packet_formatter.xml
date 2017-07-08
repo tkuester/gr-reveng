@@ -4,7 +4,7 @@
   <key>reveng_packet_formatter</key>
   <category>reveng</category>
   <import>import reveng</import>
-  <make>reveng.packet_formatter(format_str=$format_str, file_name=$file_name, log_to=$log_to, append=$append)</make>
+  <make>reveng.packet_formatter(format_str=$format_str, file_name=$file_name, log_to=$log_to, append=$append, flush=$flush)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
@@ -54,6 +54,23 @@
     <name>Append</name>
     <key>append</key>
     <value>False</value>
+    <type>enum</type>
+    <hide>part</hide>
+    <option>
+        <name>True</name>
+        <key>True</key>
+    </option>
+    <option>
+        <name>False</name>
+        <key>False</key>
+    </option>
+    <tab>Logging</tab>
+  </param>
+
+  <param>
+    <name>Flush Every Packet</name>
+    <key>flush</key>
+    <value>True</value>
     <type>enum</type>
     <hide>part</hide>
     <option>
