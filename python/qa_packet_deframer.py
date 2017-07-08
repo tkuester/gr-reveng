@@ -165,5 +165,39 @@ class qa_packet_deframer (gr_unittest.TestCase):
         self.assertTrue(isinstance(bits, numpy.ndarray))
         self.assertTrue(list(bits) == pkt)
 
+    def test_004_t (self):
+        '''
+        Test two back-to-back variable length packets. Length is indexed one
+        byte after sync. Two additional bytes for checksum after data packet.
+        '''
+        # set up fg
+        sync = map(int, bin(0xd391)[2:].zfill(16))
+        txid = map(int, bin(0x0001)[2:].zfill(16))
+        plen = map(int, bin(4)[2:].zfill(8))
+        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
+        csum = map(int, bin(0xa55a)[2:].zfill(16))
+
+        pkt = txid + plen + data + csum
+        stream = ([0] * 30) + sync + pkt + sync + pkt + ([0] * 30)
+
+        src = blocks.vector_source_b(stream)
+        test_blk = reveng.packet_deframer('boop', sync, False, 0, 2, 2)
+        sink = blocks.message_debug()
+
+        self.tb.connect(src, test_blk)
+        self.tb.msg_connect(test_blk, 'out', sink, 'store')
+        self.tb.run()
+
+        for idx in xrange(2):
+            rec_msg = pmt.to_python(sink.get_message(idx))
+
+            self.assertTrue(isinstance(rec_msg, tuple))
+            self.assertTrue(len(rec_msg) == 2)
+
+            (meta, bits) = rec_msg
+            self.assertTrue(isinstance(meta, dict))
+            self.assertTrue(isinstance(bits, numpy.ndarray))
+            self.assertTrue(list(bits) == pkt)
+
 if __name__ == '__main__':
     gr_unittest.run(qa_packet_deframer, "qa_packet_deframer.xml")
