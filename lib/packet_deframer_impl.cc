@@ -125,22 +125,29 @@ namespace gr {
 
                   boost::posix_time::ptime pkt_time = boost::posix_time::microsec_clock::universal_time();
                   pmt::pmt_t pdu, meta, data;
+                  uint8_t *data_buff;
+                  size_t o0;
+                  struct timeval tv;
+                  double ts;
 
                   meta = pmt::make_dict();
                   meta = pmt::dict_add(meta, pmt::mp("name"), pmt::intern(d_name));
 
                   // TODO: Pull the timestamp from the stream tags, if possible.
                   // Real time doesn't necessarily correspond to when we rx the samp buffer
-                  struct timeval tv;
                   if(gettimeofday(&tv, NULL) == 0) {
-                      double ts = tv.tv_sec + (tv.tv_usec / 100000.0);
+                      ts = tv.tv_sec + (tv.tv_usec / 100000.0);
                       meta = pmt::dict_add(meta, pmt::mp("ts"), pmt::from_double(ts));
                   } else {
                       meta = pmt::dict_add(meta, pmt::mp("ts"), pmt::from_double(-1));
                   }
 
                   // FIXME: Does this not work in all cases?
-                  data = pmt::make_blob((char *)&d_packet[0], d_packet.size());
+                  data = pmt::make_u8vector(d_packet.size(), 0x00);
+                  data_buff = pmt::u8vector_writable_elements(data, o0);
+                  memcpy(data_buff, &d_packet[0], sizeof(uint8_t) * d_packet.size());
+
+                  //data = pmt::make_blob((char *)&d_packet[0], d_packet.size());
 
                   pdu = pmt::cons(meta, data);
                   message_port_pub(pmt::mp("out"), pdu);
