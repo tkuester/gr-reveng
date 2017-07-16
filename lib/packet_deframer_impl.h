@@ -30,6 +30,9 @@ namespace gr {
     {
      private:
       const std::string d_name;
+      bool d_pack_bytes;
+      uint8_t d_tmp_byte;
+      uint32_t d_rx_bit_cnt;
 
       // Circular buffers to hold sync word and search pattern
       // NOTE: int64_t would be more efficient, but wouldn't let us (easily)
@@ -50,7 +53,7 @@ namespace gr {
 
      public:
       packet_deframer_impl(const std::string &name, const std::vector<char> &sync,
-              bool fixed_len, int pkt_len, int pkt_len_idx, int pkt_len_adtl);
+              bool fixed_len, int pkt_len, int pkt_len_idx, int pkt_len_adtl, bool pack_bytes);
       ~packet_deframer_impl();
 
       // Where all the action really happens

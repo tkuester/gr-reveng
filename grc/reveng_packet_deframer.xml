@@ -4,7 +4,7 @@
   <key>reveng_packet_deframer</key>
   <category>reveng</category>
   <import>import reveng</import>
-  <make>reveng.packet_deframer($name, $sync, $fixed_len, $pkt_len, $pkt_len_idx, $pkt_len_adtl)</make>
+  <make>reveng.packet_deframer($name, $sync, $fixed_len, $pkt_len, $pkt_len_idx, $pkt_len_adtl, $pack_bytes)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
@@ -135,6 +135,22 @@
     <tab>Data Format</tab>
   </param>
 
+  <param>
+    <name>Pack Bytes</name>
+    <key>pack_bytes</key>
+    <value>False</value>
+    <type>enum</type>
+    <hide>part</hide>
+    <option>
+        <name>Yes</name>
+        <key>True</key>
+    </option>
+    <option>
+        <name>No</name>
+        <key>False</key>
+    </option>
+    <tab>Data Format</tab>
+  </param>
   <!-- Make one 'sink' node per input. Sub-nodes:
        * name (an identifier for the GUI)
        * type

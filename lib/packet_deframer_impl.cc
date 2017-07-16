@@ -36,22 +36,23 @@ namespace gr {
 
     packet_deframer::sptr
     packet_deframer::make(const std::string &name, const std::vector<char> &sync, bool fixed_len,
-            int pkt_len, int pkt_len_idx, int pkt_len_adtl)
+            int pkt_len, int pkt_len_idx, int pkt_len_adtl, bool pack_bytes)
     {
       return gnuradio::get_initial_sptr
         (new packet_deframer_impl(name, sync, fixed_len,
-                                  pkt_len, pkt_len_idx, pkt_len_adtl));
+                                  pkt_len, pkt_len_idx, pkt_len_adtl, pack_bytes));
     }
 
     /*
      * The private constructor
      */
     packet_deframer_impl::packet_deframer_impl(const std::string &name, const std::vector<char> &sync,
-            bool fixed_len, int pkt_len, int pkt_len_idx, int pkt_len_adtl)
+            bool fixed_len, int pkt_len, int pkt_len_idx, int pkt_len_adtl, bool pack_bytes)
       : gr::sync_block("packet_deframer",
               gr::io_signature::make(1, 1, sizeof(char)),
               gr::io_signature::make(0, 0, 0)),
       d_name(name),
+      d_pack_bytes(pack_bytes),
       d_fixed_len(fixed_len),
       d_pkt_len(pkt_len),
       d_pkt_len_adtl(pkt_len_adtl),
@@ -79,14 +80,27 @@ namespace gr {
 
     void packet_deframer_impl::add_symbol(char symbol)
     {
+        d_rx_bit_cnt += 1;
         // Add bits onto buffer
-        d_packet.push_back(symbol);
+        if(d_pack_bytes)
+        {
+            d_tmp_byte = (d_tmp_byte << 1) | (symbol & 0x01);
+            if((d_rx_bit_cnt % 8) == 0)
+            {
+                d_packet.push_back(d_tmp_byte);
+                d_tmp_byte = 0;
+            }
+        }
+        else
+        {
+            d_packet.push_back(symbol);
+        }
 
         // If we don't have the length
         if(!d_have_len)
         {
             // Wait until we're at the beginning of the length byte
-            if(d_packet.size() > d_pkt_len_idx)
+            if(d_rx_bit_cnt > d_pkt_len_idx)
             {
                 // Shift onto the length
                 d_pkt_len <<= 1;
@@ -94,13 +108,20 @@ namespace gr {
 
                 // When we have the full length byte
                 // TODO: Allow user to specify number of bits in length byte
-                if(d_packet.size() == (d_pkt_len_idx + 8))
+                if(d_rx_bit_cnt == (d_pkt_len_idx + 8))
                 {
                     // Account for the bits we've captured so far,
                     // plus the remaining length
-                    d_pkt_len = d_packet.size() + (d_pkt_len * 8) + (d_pkt_len_adtl * 8);
+                    d_pkt_len = d_rx_bit_cnt + (d_pkt_len * 8) + (d_pkt_len_adtl * 8);
                     d_have_len = true;
-                    d_packet.reserve(d_pkt_len);
+                    if(d_pack_bytes)
+                    {
+                        d_packet.reserve(d_pkt_len / 8);
+                    }
+                    else
+                    {
+                        d_packet.reserve(d_pkt_len);
+                    }
                 }
             }
         }
@@ -119,7 +140,7 @@ namespace gr {
               add_symbol(in[i]);
 
               // Once we hit the end
-              if(d_have_len && (d_packet.size() >= d_pkt_len))
+              if(d_have_len && (d_rx_bit_cnt >= d_pkt_len))
               {
                   d_in_sync = false;
 
@@ -132,6 +153,7 @@ namespace gr {
 
                   meta = pmt::make_dict();
                   meta = pmt::dict_add(meta, pmt::mp("name"), pmt::intern(d_name));
+                  meta = pmt::dict_add(meta, pmt::mp("packed"), pmt::from_bool(d_pack_bytes));
 
                   // TODO: Pull the timestamp from the stream tags, if possible.
                   // Real time doesn't necessarily correspond to when we rx the samp buffer
@@ -162,10 +184,20 @@ namespace gr {
               if(d_search == d_sync) {
                   // TODO: More efficiently merge remaining (?) samples into d_packet
                   d_in_sync = true;
+                  d_rx_bit_cnt = 0;
+                  d_tmp_byte = 0;
                   d_packet.clear();
 
                   if(d_fixed_len)
                   {
+                      if(d_pack_bytes)
+                      {
+                          d_packet.reserve(d_pkt_len / 8);
+                      }
+                      else
+                      {
+                          d_packet.reserve(d_pkt_len);
+                      }
                       d_packet.reserve(d_pkt_len);
                       d_have_len = true;
                   }
