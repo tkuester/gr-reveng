@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.9'?>
+<?grc format='1' created='3.7.11'?>
 <flow_graph>
   <timestamp>Sat May 13 15:39:30 2017</timestamp>
   <block>
@@ -89,6 +89,34 @@ understanding of how the deframer works!</value>
     <param>
       <key>comment</key>
       <value>A one byte checksum, not included in the length.
+(Set to 0x55 as a placeholder!)</value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(16, 620)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>csum</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>0x55</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value>A one byte checksum, not included in the length.
 Each bit is represented by an X's.
 (reveng works with symbols!)</value>
     </param>
@@ -98,7 +126,7 @@ Each bit is represented by an X's.
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 421)</value>
+      <value>(336, 620)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -110,15 +138,14 @@ Each bit is represented by an X's.
     </param>
     <param>
       <key>value</key>
-      <value>[0,1] * 4</value>
+      <value>map(int, bin(csum)[2:].zfill(8))</value>
     </param>
   </block>
   <block>
     <key>variable</key>
     <param>
       <key>comment</key>
-      <value>The message to send, consists of all 'B'
-characters, and one C.</value>
+      <value>The message to send.</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -126,7 +153,7 @@ characters, and one C.</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(328, 421)</value>
+      <value>(16, 516)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -138,7 +165,34 @@ characters, and one C.</value>
     </param>
     <param>
       <key>value</key>
-      <value>[0]*((pktlen*8)-1) + [1]</value>
+      <value>"Hello world!"</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(336, 516)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>msg_bits</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>map(int, bin(int(msg.encode('hex'), 16))[2:].zfill(8 * pktlen))</value>
     </param>
   </block>
   <block>
@@ -154,7 +208,7 @@ data section.</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(328, 197)</value>
+      <value>(16, 396)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -166,14 +220,14 @@ data section.</value>
     </param>
     <param>
       <key>value</key>
-      <value>10</value>
+      <value>len(msg)</value>
     </param>
   </block>
   <block>
     <key>variable</key>
     <param>
       <key>comment</key>
-      <value>The length byte, converted into bits</value>
+      <value></value>
     </param>
     <param>
       <key>_enabled</key>
@@ -181,7 +235,7 @@ data section.</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(328, 301)</value>
+      <value>(336, 396)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -235,7 +289,7 @@ data section.</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(744, 197)</value>
+      <value>(16, 188)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -254,7 +308,7 @@ data section.</value>
     <key>variable</key>
     <param>
       <key>comment</key>
-      <value>Converts 0xd391 to an array of bits</value>
+      <value></value>
     </param>
     <param>
       <key>_enabled</key>
@@ -262,7 +316,7 @@ data section.</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 197)</value>
+      <value>(336, 188)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -289,7 +343,7 @@ data section.</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(744, 301)</value>
+      <value>(16, 292)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -308,8 +362,7 @@ data section.</value>
     <key>variable</key>
     <param>
       <key>comment</key>
-      <value>Represents the transmitter ID.
-Using A to represent the bits.</value>
+      <value></value>
     </param>
     <param>
       <key>_enabled</key>
@@ -317,7 +370,7 @@ Using A to represent the bits.</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(8, 301)</value>
+      <value>(336, 284)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -439,7 +492,7 @@ a bit!</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(328, 62)</value>
+      <value>(328, 60)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -475,7 +528,7 @@ a bit!</value>
     </param>
     <param>
       <key>vector</key>
-      <value>sync_word_bits + transmitter_id_bits + pktlen_bits + msg + csum_bits + [0]*10000</value>
+      <value>sync_word_bits + transmitter_id_bits + pktlen_bits + msg_bits + csum_bits + [0]*10000</value>
     </param>
   </block>
   <block>
@@ -486,23 +539,25 @@ a bit!</value>
     </param>
     <param>
       <key>comment</key>
-      <value>* MESSAGE DEBUG PRINT PDU VERBOSE *
-((name . RevengTestSrc) (ts . 6937513679))
-pdu_length = 128
+      <value>***********************************
+* MESSAGE DEBUG PRINT PDU VERBOSE *
+((ts . 1.50074e+09) (packed . #f) (name . RevengTestSrc))
+pdu_length = 144
 contents = 
 0000: 01 01 00 01 01 01 01 00 01 00 01 00 01 01 00 01 
 0010: 01 00 01 01 01 01 01 00 01 01 01 00 01 01 01 01 
-0020: 00 00 00 00 01 00 01 00 42 42 42 42 42 42 42 42 
-0030: 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
-0040: 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
-0050: 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
-0060: 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 42 
-0070: 42 42 42 42 42 42 42 43 58 58 58 58 58 58 58 58 
+0020: 00 00 00 00 01 01 00 00 00 01 00 00 01 00 00 00 
+0030: 00 01 01 00 00 01 00 01 00 01 01 00 01 01 00 00 
+0040: 00 01 01 00 01 01 00 00 00 01 01 00 01 01 01 01 
+0050: 00 00 01 00 00 00 00 00 00 01 01 01 00 01 01 01 
+0060: 00 01 01 00 01 01 01 01 00 01 01 01 00 00 01 00 
+0070: 00 01 01 00 01 01 00 00 00 01 01 00 00 01 00 00 
+0080: 00 00 01 00 00 00 00 01 00 01 00 01 00 01 00 01 
 ***********************************
 
 0000 - 0010: 0xdeadbeef, in bit form
 0020: The length byte, and the start of the message
-0070: The end of the message, and the checksum</value>
+0088: The end of the message, and the checksum</value>
     </param>
     <param>
       <key>_enabled</key>
@@ -510,7 +565,7 @@ contents =
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(744, 412)</value>
+      <value>(880, 364)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -528,8 +583,8 @@ contents =
   <block>
     <key>reveng_packet_deframer</key>
     <param>
-      <key>pkt_len_adtl</key>
-      <value>len(csum_bits)/8</value>
+      <key>pkt_len_adj</key>
+      <value>1</value>
     </param>
     <param>
       <key>alias</key>
@@ -568,12 +623,16 @@ contents =
       <value>reveng_packet_deframer_0</value>
     </param>
     <param>
-      <key>pkt_len_idx</key>
-      <value>len(transmitter_id_bits)/8</value>
+      <key>pkt_len_offset</key>
+      <value>4</value>
     </param>
     <param>
       <key>msb</key>
       <value>True</value>
+    </param>
+    <param>
+      <key>max_len</key>
+      <value>0</value>
     </param>
     <param>
       <key>maxoutbuf</key>
@@ -592,6 +651,10 @@ contents =
       <value>RevengTestSrc</value>
     </param>
     <param>
+      <key>pack_bytes</key>
+      <value>False</value>
+    </param>
+    <param>
       <key>pkt_len</key>
       <value>2</value>
     </param>
@@ -602,6 +665,10 @@ contents =
   </block>
   <block>
     <key>reveng_packet_formatter</key>
+    <param>
+      <key>append</key>
+      <value>False</value>
+    </param>
     <param>
       <key>alias</key>
       <value></value>
@@ -619,8 +686,16 @@ contents =
       <value>True</value>
     </param>
     <param>
+      <key>file_name</key>
+      <value></value>
+    </param>
+    <param>
+      <key>flush</key>
+      <value>True</value>
+    </param>
+    <param>
       <key>format_str</key>
-      <value>%(name)\ntransmitter_id: %(hex[0:32])\nPacket Length: %(hex[32:40])\nFull Packet: %(hex)\n</value>
+      <value>%(name)\nFull Packet: %(hex)\ntransmitter_id: %(hex[0:32])\nPacket Length: %(int[32:40])\nMessage: %(ascii[40:-8])\nChecksum: %(hex[-8:])\n</value>
     </param>
     <param>
       <key>_coordinate</key>
@@ -633,6 +708,10 @@ contents =
     <param>
       <key>id</key>
       <value>reveng_packet_formatter_0</value>
+    </param>
+    <param>
+      <key>log_to</key>
+      <value>"stdout"</value>
     </param>
   </block>
   <connection>
