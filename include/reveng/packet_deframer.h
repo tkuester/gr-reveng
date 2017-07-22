@@ -50,7 +50,7 @@ namespace gr {
        * creating new instances.
        */
       static sptr make(const std::string &name, const std::vector<char> &sync,
-              bool fixed_len, int pkt_len, int pkt_len_idx, int pkt_len_adtl, bool pack_bytes);
+              bool fixed_len, int pkt_len, int max_len, int pkt_len_offset, int pkt_len_adj, bool pack_bytes);
     };
 
   } // namespace reveng

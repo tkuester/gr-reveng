@@ -46,7 +46,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
         stream = ([0] * 30) + sync + data + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, True, len(data), 0, 0, False)
+        test_blk = reveng.packet_deframer('boop', sync, True, len(data), 0, 0, 0, False)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -78,7 +78,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
         stream = ([0] * 30) + sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 0, False)
+        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 0, 0, False)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -113,7 +113,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
         stream = ([0] * 30) + sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 2, False)
+        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 0, 2, False)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -147,7 +147,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
         stream = ([0] * 30) + sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 2, 2, False)
+        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 2, 2, False)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -181,7 +181,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
         stream = ([0] * 30) + sync + pkt + sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 2, 2, False)
+        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 2, 2, False)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -207,7 +207,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
         stream = ([0] * 30) + sync + data + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, True, len(data), 0, 0, True)
+        test_blk = reveng.packet_deframer('boop', sync, True, len(data), 0, 0, 0, True)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -239,7 +239,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
         stream = ([0] * 30) + sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 0, True)
+        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 0, 0, True)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -274,7 +274,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
         stream = ([0] * 30) + sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 2, True)
+        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 0, 2, True)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -308,7 +308,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
         stream = ([0] * 30) + sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 2, 2, True)
+        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 2, 2, True)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -342,7 +342,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
         stream = ([0] * 30) + sync + pkt + sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 2, 2, True)
+        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 2, 2, True)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -359,6 +359,49 @@ class qa_packet_deframer (gr_unittest.TestCase):
             self.assertTrue(isinstance(meta, dict))
             self.assertTrue(isinstance(bytez, numpy.ndarray))
             self.assertTrue(list(bytez) == [0x00, 0x01, 0x04, 0xde, 0xad, 0xbe, 0xef, 0xa5, 0x5a])
+
+    def test_011_t (self):
+        '''
+        Test that max length drops packet with corrupted length byte. Send
+        back-to-back variable length packets. Length is indexed one
+        byte after sync. Two additional bytes for checksum after data packet.
+        '''
+        # set up fg
+        sync = map(int, bin(0xd391)[2:].zfill(16))
+        txid = map(int, bin(0x0001)[2:].zfill(16))
+        p_bad_len = map(int, bin(99)[2:].zfill(8))
+        plen = map(int, bin(4)[2:].zfill(8))
+        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
+        csum = map(int, bin(0xa55a)[2:].zfill(16))
+
+        pkt1 = txid + p_bad_len + data + csum
+        pkt2 = txid + plen + data + csum
+
+        stream = ([0] * 30) + sync + pkt1 + sync + pkt2 + ([0] * 30)
+
+        src = blocks.vector_source_b(stream)
+        test_blk = reveng.packet_deframer('boop', sync, False, 0, 4, 2, 2, True)
+        sink = blocks.message_debug()
+
+        self.tb.connect(src, test_blk)
+        self.tb.msg_connect(test_blk, 'out', sink, 'store')
+        self.tb.run()
+
+        rec_msg = pmt.to_python(sink.get_message(0))
+
+        self.assertTrue(isinstance(rec_msg, tuple))
+        self.assertTrue(len(rec_msg) == 2)
+
+        (meta, bytez) = rec_msg
+        self.assertTrue(isinstance(meta, dict))
+        self.assertTrue(isinstance(bytez, numpy.ndarray))
+        self.assertTrue(list(bytez) == [0x00, 0x01, 0x04, 0xde, 0xad, 0xbe, 0xef, 0xa5, 0x5a])
+
+        try:
+            rec_msg = pmt.to_python(sink.get_message(1))
+            self.assertTrue(False)
+        except RuntimeError:
+            pass
 
 if __name__ == '__main__':
     gr_unittest.run(qa_packet_deframer, "qa_packet_deframer.xml")

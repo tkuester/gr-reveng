@@ -46,14 +46,15 @@ namespace gr {
 
       std::vector<char> d_packet;
       int d_pkt_len;
-      int d_pkt_len_idx;
-      int d_pkt_len_adtl;
+      int d_max_len;
+      int d_pkt_len_offset;
+      int d_pkt_len_adj;
 
       void add_symbol(char symbol);
 
      public:
       packet_deframer_impl(const std::string &name, const std::vector<char> &sync,
-              bool fixed_len, int pkt_len, int pkt_len_idx, int pkt_len_adtl, bool pack_bytes);
+              bool fixed_len, int pkt_len, int max_len, int pkt_len_offset, int pkt_len_adj, bool pack_bytes);
       ~packet_deframer_impl();
 
       // Where all the action really happens

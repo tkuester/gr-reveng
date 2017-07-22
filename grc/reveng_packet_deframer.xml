@@ -4,7 +4,7 @@
   <key>reveng_packet_deframer</key>
   <category>reveng</category>
   <import>import reveng</import>
-  <make>reveng.packet_deframer($name, $sync, $fixed_len, $pkt_len, $pkt_len_idx, $pkt_len_adtl, $pack_bytes)</make>
+  <make>reveng.packet_deframer($name, $sync, $fixed_len, $pkt_len, $max_len, $pkt_len_offset, $pkt_len_adj, $pack_bytes)</make>
   <!-- Make one 'param' node for every Parameter you want settable from the GUI.
        Sub-nodes:
        * name
@@ -54,8 +54,16 @@
   </param>
 
   <param>
+    <name>Max Len (bits)</name>
+    <key>max_len</key>
+    <value>-1</value>
+    <type>int</type>
+    <hide>#if str($fixed_len()).startswith('True') then 'none' else 'all'#</hide>
+  </param>
+
+  <param>
     <name>Len Offset (bytes)</name>
-    <key>pkt_len_idx</key>
+    <key>pkt_len_offset</key>
     <value>0</value>
     <type>int</type>
     <hide>#if str($fixed_len()).startswith('True') then 'all' else 'none'#</hide>
@@ -63,10 +71,10 @@
 
   <param>
     <name>Additional Bytes</name>
-    <key>pkt_len_adtl</key>
+    <key>pkt_len_adj</key>
     <value>0</value>
     <type>int</type>
-    <hide>$(((str($fixed_len()).startswith('False')) and (($pkt_len_adtl() > 0) and 'none' or 'part')) or 'all')</hide>
+    <hide>$(((str($fixed_len()).startswith('False')) and (($pkt_len_adj() > 0) and 'none' or 'part')) or 'all')</hide>
   </param>
 
   <param>
