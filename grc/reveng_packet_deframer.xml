@@ -54,11 +54,11 @@
   </param>
 
   <param>
-    <name>Max Len (bits)</name>
+    <name>Max Len (bytes)</name>
     <key>max_len</key>
-    <value>-1</value>
+    <value>0</value>
     <type>int</type>
-    <hide>#if str($fixed_len()).startswith('True') then 'none' else 'all'#</hide>
+    <hide>$(((str($fixed_len()).startswith('False')) and (($max_len() > 0) and 'none' or 'part')) or 'all')</hide>
   </param>
 
   <param>
