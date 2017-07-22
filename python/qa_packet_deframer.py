@@ -133,7 +133,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
 
     def test_004_t (self):
         '''
-        Test variable length packet. Length is indexed one byte after
+        Test variable length packet. Length is indexed two bytes after
         sync. Two additional bytes for checksum after data packet.
         '''
         # set up fg
@@ -294,7 +294,7 @@ class qa_packet_deframer (gr_unittest.TestCase):
 
     def test_009_t (self):
         '''
-        Test variable length packet. Length is indexed one byte after
+        Test variable length packet. Length is indexed two bytes after
         sync. Two additional bytes for checksum after data packet.
         '''
         # set up fg
