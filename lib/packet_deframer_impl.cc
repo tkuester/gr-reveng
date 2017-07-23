@@ -36,18 +36,18 @@ namespace gr {
 
     packet_deframer::sptr
     packet_deframer::make(const std::string &name, const std::vector<char> &sync, bool fixed_len,
-            int pkt_len, int pkt_len_idx, int pkt_len_adtl, bool pack_bytes)
+            int pkt_len, int max_len, int pkt_len_offset, int pkt_len_adj, bool pack_bytes)
     {
       return gnuradio::get_initial_sptr
         (new packet_deframer_impl(name, sync, fixed_len,
-                                  pkt_len, pkt_len_idx, pkt_len_adtl, pack_bytes));
+                                  pkt_len, max_len, pkt_len_offset, pkt_len_adj, pack_bytes));
     }
 
     /*
      * The private constructor
      */
     packet_deframer_impl::packet_deframer_impl(const std::string &name, const std::vector<char> &sync,
-            bool fixed_len, int pkt_len, int pkt_len_idx, int pkt_len_adtl, bool pack_bytes)
+            bool fixed_len, int pkt_len, int max_len, int pkt_len_offset, int pkt_len_adj, bool pack_bytes)
       : gr::sync_block("packet_deframer",
               gr::io_signature::make(1, 1, sizeof(char)),
               gr::io_signature::make(0, 0, 0)),
@@ -55,7 +55,8 @@ namespace gr {
       d_pack_bytes(pack_bytes),
       d_fixed_len(fixed_len),
       d_pkt_len(pkt_len),
-      d_pkt_len_adtl(pkt_len_adtl),
+      d_max_len(max_len),
+      d_pkt_len_adj(pkt_len_adj),
       d_in_sync(false)
     {
         message_port_register_out(pmt::mp("out"));
@@ -63,7 +64,7 @@ namespace gr {
         // Match the size of the sync word
         d_sync = boost::circular_buffer<char>(sync.size());
         d_search = boost::circular_buffer<char>(sync.size());
-        d_pkt_len_idx = pkt_len_idx * 8;
+        d_pkt_len_offset = pkt_len_offset * 8;
 
         for(int i = 0; i < sync.size(); i++)
             d_sync.push_back(sync[i]);
@@ -117,7 +118,7 @@ namespace gr {
         if(!d_have_len)
         {
             // Wait until we're at the beginning of the length byte
-            if(d_rx_bit_cnt > d_pkt_len_idx)
+            if(d_rx_bit_cnt > d_pkt_len_offset)
             {
                 // Shift onto the length
                 d_pkt_len <<= 1;
@@ -125,11 +126,16 @@ namespace gr {
 
                 // When we have the full length byte
                 // TODO: Allow user to specify number of bits in length byte
-                if(d_rx_bit_cnt == (d_pkt_len_idx + 8))
+                if(d_rx_bit_cnt == (d_pkt_len_offset + 8))
                 {
+                    if(d_max_len > 0 && d_pkt_len > d_max_len)
+                    {
+                        d_in_sync = false;
+                    }
+
                     // Account for the bits we've captured so far,
                     // plus the remaining length
-                    d_pkt_len = d_rx_bit_cnt + (d_pkt_len * 8) + (d_pkt_len_adtl * 8);
+                    d_pkt_len = d_rx_bit_cnt + (d_pkt_len * 8) + (d_pkt_len_adj * 8);
                     d_have_len = true;
                     if(d_pack_bytes)
                     {

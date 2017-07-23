@@ -54,7 +54,7 @@ class packet_formatter(gr.basic_block):
         self.message_port_register_in(pmt.intern('pdus'))
         self.set_msg_handler(pmt.intern('pdus'), self.handle_pdu)
 
-        self.format_str = format_str
+        self.format_str = format_str.replace('\\n', '\n')
         self.file_name = file_name
         self.fp = None
         self.flush = flush
@@ -114,7 +114,6 @@ class packet_formatter(gr.basic_block):
 
     def format_output(self, meta, bits):
         '''
-        TODO: Pull in TS from PDU
         if self.rel_time == None:
             out = self.format_str
         elif self.rel_time == True:
@@ -163,6 +162,8 @@ class packet_formatter(gr.basic_block):
                 tmp = ''.join(map(str, sub_bits))
             elif tipe == 'hex':
                 tmp = ''.join(['%02x' % byte for byte in l_bites])
+            elif tipe == 'int':
+                tmp = str(int(''.join(map(str, sub_bits)), 2))
             elif tipe == 'ascii':
                 tmp = repr(''.join([chr(c) for c in l_bites]))[1:-1]
             elif tipe == 'man-bits':
