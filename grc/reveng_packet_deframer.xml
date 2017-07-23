@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <block>
-  <name>Packet Deframer</name>
+  <name>Packet Deframer (gotenna)</name>
   <key>reveng_packet_deframer</key>
   <category>reveng</category>
   <import>import reveng</import>

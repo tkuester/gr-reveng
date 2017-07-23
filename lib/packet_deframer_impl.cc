@@ -94,7 +94,25 @@ namespace gr {
                 // Hack for gr-gotenna
                 if(!d_fixed_len && !d_have_len)
                 {
-                    if(d_packet.size() == 5)
+                    // Skip packets that don't start with gotenna types
+                    if(d_packet.size() == 1)
+                    {
+                        switch(d_packet[0])
+                        {
+                            case 0x11:
+                            case 0x10:
+                            case 0x62:
+                            case 0x23:
+                            case 0x34:
+                            case 0x45:
+                            case 0x56:
+                                break;
+
+                            default:
+                                d_in_sync = false;
+                        }
+                    }
+                    else if(d_packet.size() == 5)
                     {
                         // Packets 0x56 and 0x62 are fixed length
                         // Packet 0x34 is fixed length if byte[4] == 0x00
