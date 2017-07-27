@@ -86,6 +86,9 @@ class packet_formatter(gr.basic_block):
         meta = pmt.to_python(pmt.car(pdu)) or {}
         bits = pmt.to_python(pmt.cdr(pdu))
 
+        if meta.get('packed', False):
+            bits = numpy.unpackbits(bytearray(bits))
+
         try:
             output = self.format_output(meta, bits)
             if self.stdout:
