@@ -1,741 +1,326 @@
-<?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.11'?>
-<flow_graph>
-  <timestamp>Sat May 13 15:39:30 2017</timestamp>
-  <block>
-    <key>options</key>
-    <param>
-      <key>author</key>
-      <value></value>
-    </param>
-    <param>
-      <key>window_size</key>
-      <value></value>
-    </param>
-    <param>
-      <key>category</key>
-      <value>Custom</value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value>This flowgraph builds a simple packet, and sends
-it through the Deframer. Try modifying the
-packet structure and parameters to test your
-understanding of how the deframer works!</value>
-    </param>
-    <param>
-      <key>description</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(8, 13)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>generate_options</key>
-      <value>qt_gui</value>
-    </param>
-    <param>
-      <key>hier_block_src_path</key>
-      <value>.:</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>reveng_simple_test</value>
-    </param>
-    <param>
-      <key>max_nouts</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>qt_qss_theme</key>
-      <value></value>
-    </param>
-    <param>
-      <key>realtime_scheduling</key>
-      <value></value>
-    </param>
-    <param>
-      <key>run_command</key>
-      <value>{python} -u {filename}</value>
-    </param>
-    <param>
-      <key>run_options</key>
-      <value>prompt</value>
-    </param>
-    <param>
-      <key>run</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>thread_safe_setters</key>
-      <value></value>
-    </param>
-    <param>
-      <key>title</key>
-      <value></value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value>A one byte checksum, not included in the length.
-(Set to 0x55 as a placeholder!)</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(16, 620)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>csum</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>0x55</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value>A one byte checksum, not included in the length.
-Each bit is represented by an X's.
-(reveng works with symbols!)</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(336, 620)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>csum_bits</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>map(int, bin(csum)[2:].zfill(8))</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value>The message to send.</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(16, 516)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>msg</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>"Hello world!"</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(336, 516)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>msg_bits</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>map(int, bin(int(msg.encode('hex'), 16))[2:].zfill(8 * pktlen))</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value>How many bytes to transmit in the
-data section.</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(16, 396)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>pktlen</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>len(msg)</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(336, 396)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>pktlen_bits</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>map(int, bin(pktlen )[2:].zfill(8))</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(184, 13)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>32000</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value>ChipCon likes 0xd391!</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(16, 188)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>sync_word</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>0xd391</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(336, 188)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>sync_word_bits</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>map(int, bin(sync_word)[2:].zfill(16))</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value>The transmitter ID is 0xdeadbeef</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(16, 292)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>transmitter_id</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>0xdeadbeef</value>
-    </param>
-  </block>
-  <block>
-    <key>variable</key>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(336, 284)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>transmitter_id_bits</value>
-    </param>
-    <param>
-      <key>value</key>
-      <value>map(int, bin(transmitter_id)[2:].zfill(32))</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_message_debug</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value>Remember, each "byte" on screen is actually
-a bit!</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(1000, 17)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_message_debug_0</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_throttle</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(560, 76)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_throttle_0</value>
-    </param>
-    <param>
-      <key>ignoretag</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>samples_per_second</key>
-      <value>samp_rate</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-  </block>
-  <block>
-    <key>blocks_vector_source_x</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value>Modify the packet structure here!</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(328, 60)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>blocks_vector_source_x_0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>type</key>
-      <value>byte</value>
-    </param>
-    <param>
-      <key>repeat</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>tags</key>
-      <value>[]</value>
-    </param>
-    <param>
-      <key>vlen</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>vector</key>
-      <value>sync_word_bits + transmitter_id_bits + pktlen_bits + msg_bits + csum_bits + [0]*10000</value>
-    </param>
-  </block>
-  <block>
-    <key>note</key>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value>***********************************
-* MESSAGE DEBUG PRINT PDU VERBOSE *
-((ts . 1.50074e+09) (packed . #f) (name . RevengTestSrc))
-pdu_length = 144
-contents = 
-0000: 01 01 00 01 01 01 01 00 01 00 01 00 01 01 00 01 
-0010: 01 00 01 01 01 01 01 00 01 01 01 00 01 01 01 01 
-0020: 00 00 00 00 01 01 00 00 00 01 00 00 01 00 00 00 
-0030: 00 01 01 00 00 01 00 01 00 01 01 00 01 01 00 00 
-0040: 00 01 01 00 01 01 00 00 00 01 01 00 01 01 01 01 
-0050: 00 00 01 00 00 00 00 00 00 01 01 01 00 01 01 01 
-0060: 00 01 01 00 01 01 01 01 00 01 01 01 00 00 01 00 
-0070: 00 01 01 00 01 01 00 00 00 01 01 00 00 01 00 00 
-0080: 00 00 01 00 00 00 00 01 00 01 00 01 00 01 00 01 
-***********************************
+options:
+  parameters:
+    author: ''
+    category: Custom
+    cmake_opt: ''
+    comment: 'This flowgraph builds a simple packet, and sends
 
-0000 - 0010: 0xdeadbeef, in bit form
-0020: The length byte, and the start of the message
-0088: The end of the message, and the checksum</value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(880, 364)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>note_0</value>
-    </param>
-    <param>
-      <key>note</key>
-      <value></value>
-    </param>
-  </block>
-  <block>
-    <key>reveng_packet_deframer</key>
-    <param>
-      <key>pkt_len_adj</key>
-      <value>1</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value></value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>encoding</key>
-      <value>none</value>
-    </param>
-    <param>
-      <key>big_endian</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(736, 48)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>reveng_packet_deframer_0</value>
-    </param>
-    <param>
-      <key>pkt_len_offset</key>
-      <value>4</value>
-    </param>
-    <param>
-      <key>msb</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>max_len</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>maxoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>minoutbuf</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>fixed_len</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>name</key>
-      <value>RevengTestSrc</value>
-    </param>
-    <param>
-      <key>pack_bytes</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>pkt_len</key>
-      <value>2</value>
-    </param>
-    <param>
-      <key>sync</key>
-      <value>sync_word_bits</value>
-    </param>
-  </block>
-  <block>
-    <key>reveng_packet_formatter</key>
-    <param>
-      <key>append</key>
-      <value>False</value>
-    </param>
-    <param>
-      <key>alias</key>
-      <value></value>
-    </param>
-    <param>
-      <key>comment</key>
-      <value>The new Packet Formatter object!</value>
-    </param>
-    <param>
-      <key>affinity</key>
-      <value></value>
-    </param>
-    <param>
-      <key>_enabled</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>file_name</key>
-      <value></value>
-    </param>
-    <param>
-      <key>flush</key>
-      <value>True</value>
-    </param>
-    <param>
-      <key>format_str</key>
-      <value>%(name)\nFull Packet: %(hex)\ntransmitter_id: %(hex[0:32])\nPacket Length: %(int[32:40])\nMessage: %(ascii[40:-8])\nChecksum: %(hex[-8:])\n</value>
-    </param>
-    <param>
-      <key>_coordinate</key>
-      <value>(1000, 188)</value>
-    </param>
-    <param>
-      <key>_rotation</key>
-      <value>0</value>
-    </param>
-    <param>
-      <key>id</key>
-      <value>reveng_packet_formatter_0</value>
-    </param>
-    <param>
-      <key>log_to</key>
-      <value>"stdout"</value>
-    </param>
-  </block>
-  <connection>
-    <source_block_id>blocks_throttle_0</source_block_id>
-    <sink_block_id>reveng_packet_deframer_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>blocks_vector_source_x_0</source_block_id>
-    <sink_block_id>blocks_throttle_0</sink_block_id>
-    <source_key>0</source_key>
-    <sink_key>0</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>reveng_packet_deframer_0</source_block_id>
-    <sink_block_id>blocks_message_debug_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>print_pdu</sink_key>
-  </connection>
-  <connection>
-    <source_block_id>reveng_packet_deframer_0</source_block_id>
-    <sink_block_id>reveng_packet_formatter_0</sink_block_id>
-    <source_key>out</source_key>
-    <sink_key>pdus</sink_key>
-  </connection>
-</flow_graph>
+      it through the Deframer. Try modifying the
+
+      packet structure and parameters to test your
+
+      understanding of how the deframer works!'
+    copyright: ''
+    description: ''
+    gen_cmake: 'On'
+    gen_linking: dynamic
+    generate_options: qt_gui
+    hier_block_src_path: '.:'
+    id: reveng_simple_test
+    max_nouts: '0'
+    output_language: python
+    placement: (0,0)
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    run_options: prompt
+    sizing_mode: fixed
+    thread_safe_setters: ''
+    title: ''
+    window_size: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 13]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: csum
+  id: variable
+  parameters:
+    comment: 'A one byte checksum, not included in the length.
+
+      (Set to 0x55 as a placeholder!)'
+    value: '0x55'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 620]
+    rotation: 0
+    state: enabled
+- name: csum_bits
+  id: variable
+  parameters:
+    comment: 'A one byte checksum, not included in the length.
+
+      Each bit is represented by an X''s.
+
+      (reveng works with symbols!)'
+    value: list(map(int, bin(csum)[2:].zfill(8)))
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [336, 620]
+    rotation: 0
+    state: enabled
+- name: msg
+  id: variable
+  parameters:
+    comment: The message to send.
+    value: '"Hello world!"'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 516]
+    rotation: 0
+    state: enabled
+- name: msg_bits
+  id: variable
+  parameters:
+    comment: ''
+    value: list(map(int, bin(int(hex(msg.encode()), 16))[2:].zfill(8 * pktlen)))
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [336, 516]
+    rotation: 0
+    state: enabled
+- name: pktlen
+  id: variable
+  parameters:
+    comment: 'How many bytes to transmit in the
+
+      data section.'
+    value: len(msg)
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 396]
+    rotation: 0
+    state: enabled
+- name: pktlen_bits
+  id: variable
+  parameters:
+    comment: ''
+    value: list(map(int, bin(pktlen )[2:].zfill(8)))
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [336, 396]
+    rotation: 0
+    state: enabled
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: '32000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [184, 13]
+    rotation: 0
+    state: enabled
+- name: sync_word
+  id: variable
+  parameters:
+    comment: ChipCon likes 0xd391!
+    value: '0xd391'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 188]
+    rotation: 0
+    state: enabled
+- name: sync_word_bits
+  id: variable
+  parameters:
+    comment: ''
+    value: list(map(int, bin(sync_word)[2:].zfill(16)))
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [336, 188]
+    rotation: 0
+    state: enabled
+- name: transmitter_id
+  id: variable
+  parameters:
+    comment: The transmitter ID is 0xdeadbeef
+    value: '0xdeadbeef'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [16, 292]
+    rotation: 0
+    state: enabled
+- name: transmitter_id_bits
+  id: variable
+  parameters:
+    comment: ''
+    value: list(map(int, bin(transmitter_id)[2:].zfill(32)))
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [336, 284]
+    rotation: 0
+    state: enabled
+- name: blocks_message_debug_0
+  id: blocks_message_debug
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: 'Remember, each "byte" on screen is actually
+
+      a bit!'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1000, 17]
+    rotation: 0
+    state: enabled
+- name: blocks_throttle_0
+  id: blocks_throttle
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    ignoretag: 'True'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samples_per_second: samp_rate
+    type: byte
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [560, 76]
+    rotation: 0
+    state: enabled
+- name: blocks_vector_source_x_0
+  id: blocks_vector_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: Modify the packet structure here!
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    repeat: 'True'
+    tags: '[]'
+    type: byte
+    vector: sync_word_bits + transmitter_id_bits + pktlen_bits + msg_bits + csum_bits
+      + [0]*10000
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [328, 60]
+    rotation: 0
+    state: enabled
+- name: import_0
+  id: import
+  parameters:
+    alias: ''
+    comment: ''
+    imports: from binascii import hexlify as hex
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [680, 256.0]
+    rotation: 0
+    state: true
+- name: note_0
+  id: note
+  parameters:
+    alias: ''
+    comment: "***********************************\n* MESSAGE DEBUG PRINT PDU VERBOSE\
+      \ *\n((ts . 1.50074e+09) (packed . #f) (name . RevengTestSrc))\npdu_length =\
+      \ 144\ncontents = \n0000: 01 01 00 01 01 01 01 00 01 00 01 00 01 01 00 01 \n\
+      0010: 01 00 01 01 01 01 01 00 01 01 01 00 01 01 01 01 \n0020: 00 00 00 00 01\
+      \ 01 00 00 00 01 00 00 01 00 00 00 \n0030: 00 01 01 00 00 01 00 01 00 01 01\
+      \ 00 01 01 00 00 \n0040: 00 01 01 00 01 01 00 00 00 01 01 00 01 01 01 01 \n\
+      0050: 00 00 01 00 00 00 00 00 00 01 01 01 00 01 01 01 \n0060: 00 01 01 00 01\
+      \ 01 01 01 00 01 01 01 00 00 01 00 \n0070: 00 01 01 00 01 01 00 00 00 01 01\
+      \ 00 00 01 00 00 \n0080: 00 00 01 00 00 00 00 01 00 01 00 01 00 01 00 01 \n\
+      ***********************************\n\n0000 - 0010: 0xdeadbeef, in bit form\n\
+      0020: The length byte, and the start of the message\n0088: The end of the message,\
+      \ and the checksum"
+    note: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [880, 364]
+    rotation: 0
+    state: enabled
+- name: reveng_packet_deframer_0
+  id: reveng_packet_deframer
+  parameters:
+    affinity: ''
+    alias: ''
+    big_endian: 'True'
+    comment: ''
+    encoding: none
+    fixed_len: 'False'
+    max_len: '0'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    msb: 'True'
+    name: RevengTestSrc
+    pack_bytes: 'False'
+    pkt_len: '2'
+    pkt_len_adj: '1'
+    pkt_len_offset: '4'
+    sync: sync_word_bits
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [744, 44.0]
+    rotation: 0
+    state: enabled
+- name: reveng_packet_formatter_0
+  id: reveng_packet_formatter
+  parameters:
+    affinity: ''
+    alias: ''
+    append: 'False'
+    comment: The new Packet Formatter object!
+    file_name: ''
+    flush: 'True'
+    format_str: '%(name)\nFull Packet: %(hex)\ntransmitter_id: %(hex[0:32])\nPacket
+      Length: %(int[32:40])\nMessage: %(ascii[40:-8])\nChecksum: %(hex[-8:])\n'
+    log_to: '"stdout"'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1000, 188]
+    rotation: 0
+    state: enabled
+
+connections:
+- [blocks_throttle_0, '0', reveng_packet_deframer_0, '0']
+- [blocks_vector_source_x_0, '0', blocks_throttle_0, '0']
+- [reveng_packet_deframer_0, out, blocks_message_debug_0, print_pdu]
+- [reveng_packet_deframer_0, out, reveng_packet_formatter_0, pdus]
+
+metadata:
+  file_format: 1
