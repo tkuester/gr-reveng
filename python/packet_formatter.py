@@ -98,11 +98,8 @@ class packet_formatter(gr.basic_block):
                 self.fp.write('\n')
                 if self.flush:
                     self.fp.flush()
-        except IndexError as e:
-            print("gr-reveng: IndexError: Ran out of bits?", file=sys.stderr)
-            print(traceback.format_exc(e), file=sys.stderr)
-        except ValueError as e:
-            print("gr-reveng: TypeError: Something casted wrong!", file=sys.stderr)
+        except (IndexError, ValueError, TypeError) as e:
+            print("gr-reveng: Formatting error", file=sys.stderr)
             print(traceback.format_exc(e), file=sys.stderr)
         except IOError as e:
             print("gr-reveng: IOError: Unable to write to file, closing", file=sys.stderr)
@@ -130,54 +127,50 @@ class packet_formatter(gr.basic_block):
         out = self.format_str
 
         # Search for %(what[start:stop])
-        input_str = out # Probs shouldn't change what we're re.finditer'ing
-        for match in re.finditer(r'%\(([^\)]+)\)', input_str):
+        rex = r'%\(([^\)\[]+)(?:\[([^:\]]*):?(?:([^\]]+))?\])?\)'
+        input_str = out
+
+        for match in re.finditer(rex, input_str):
             to_replace = match.group()
 
-            what = match.groups()[0].rstrip(']').split('[')
-            tipe = what[0]
-
-            # If we have a second part, it contains [start:stop], [idx], or [start:]
-            if len(what) == 2:
-                substr = what[1].split(':')
-                if len(substr) == 1:
-                    start = int(substr[0])
-                    stop = int(substr[0]) + 1
-                else:
-                    start = int(substr[0])
-                    if substr[1] == "":
-                        stop = None
-                    else:
-                        stop = int(substr[1])
-            else:
+            (fmt_type, start, stop) = match.groups()
+            if start == '':
                 start = None
-                stop = None
+            elif start is not None:
+                start = int(start)
 
-            sub_bits = bits[start:stop]
+            if stop is not None and stop != '':
+                stop = int(stop)
+
+            if start and stop is None:
+                sub_bits = [bits[start]]
+            else:
+                sub_bits = bits[start:stop]
+
             l_bites = numpy.packbits(bytearray(sub_bits))
-            r_bites = numpy.packbits(bytearray([0] * (8 - (len(sub_bits) % 8) + sub_bits)))
+            #r_bites = numpy.packbits(bytearray([0] * (8 - (len(sub_bits) % 8)) + sub_bits))
 
-            if tipe == 'name':
+            if fmt_type == 'name':
                 tmp = meta.get('name', "None")
-            elif tipe == 'ts':
+            elif fmt_type == 'ts':
                 tmp = '%d.%06d' % (meta.get('tv_sec', -1), meta.get('tv_usec', -1))
-            elif tipe == 'bits':
+            elif fmt_type == 'bits':
                 tmp = ''.join(map(str, sub_bits))
-            elif tipe == 'hex':
+            elif fmt_type == 'hex':
                 tmp = ''.join(['%02x' % byte for byte in l_bites])
-            elif tipe == 'int':
+            elif fmt_type == 'int':
                 tmp = str(int(''.join(map(str, sub_bits)), 2))
-            elif tipe == 'ascii':
+            elif fmt_type == 'ascii':
                 tmp = repr(''.join([chr(c) for c in l_bites]))[1:-1]
-            elif tipe == 'man-bits':
+            elif fmt_type == 'man-bits':
                 continue
-                tmp = man_decode(sub_bits)
-            elif tipe == 'pwm-bits':
+                #tmp = man_decode(sub_bits)
+            elif fmt_type == 'pwm-bits':
                 continue
-                tmp = pwm_decode(sub_bits)
-            elif tipe == 'hdlcd':
+                #tmp = pwm_decode(sub_bits)
+            elif fmt_type == 'hdlcd':
                 continue
-                tmp = hdlc_data_decode(sub_bits)
+                #tmp = hdlc_data_decode(sub_bits)
             else:
                 # Unknown type
                 continue
