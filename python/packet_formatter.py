@@ -64,13 +64,13 @@ class packet_formatter(gr.basic_block):
             try:
                 self.fp = open(file_name, 'a' if append else 'w')
             except (OSError, IOError):
-                print >> sys.stderr, "gr-reveng: Unable to open '%s' for writing" % file_name
+                print("gr-reveng: Unable to open '%s' for writing" % file_name, file=sys.stderr)
 
     def stop(self):
         if not self.fp:
             return
 
-        print >> sys.stderr, "gr-reveng: Closing %s" % (self.file_name)
+        print("gr-reveng: Closing %s" % (self.file_name), file=sys.stderr)
         try:
             self.fp.close()
         except (OSError, IOError):
@@ -92,28 +92,28 @@ class packet_formatter(gr.basic_block):
         try:
             output = self.format_output(meta, bits)
             if self.stdout:
-                print output
+                print(output)
             if self.fp:
                 self.fp.write(output)
                 self.fp.write('\n')
                 if self.flush:
                     self.fp.flush()
         except IndexError as e:
-            print >> sys.stderr, "gr-reveng: IndexError: Ran out of bits?"
-            print >> sys.stderr, traceback.format_exc(e)
+            print("gr-reveng: IndexError: Ran out of bits?", file=sys.stderr)
+            print(traceback.format_exc(e), file=sys.stderr)
         except ValueError as e:
-            print >> sys.stderr, "gr-reveng: TypeError: Something casted wrong!"
-            print >> sys.stderr, traceback.format_exc(e)
+            print("gr-reveng: TypeError: Something casted wrong!", file=sys.stderr)
+            print(traceback.format_exc(e), file=sys.stderr)
         except IOError as e:
-            print >> sys.stderr, "gr-reveng: IOError: Unable to write to file, closing"
+            print("gr-reveng: IOError: Unable to write to file, closing", file=sys.stderr)
             try:
                 self.fp.close()
             except (OSError, IOError):
                 pass
             self.fp = None
         except StandardError as e:
-            print >> sys.stderr, "gr-reveng: %s: Something went horribly wrong!" % type(e)
-            print >> sys.stderr, traceback.format_exc(e)
+            print("gr-reveng: %s: Something went horribly wrong!" % type(e), file=sys.stderr)
+            print(traceback.format_exc(e), file=sys.stderr)
 
     def format_output(self, meta, bits):
         '''

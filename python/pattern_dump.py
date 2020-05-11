@@ -104,10 +104,10 @@ class pattern_dump(gr.sync_block):
         if self.file_name:
             try:
                 self.fp = open(self.file_name, 'w')
-                print 'gr-reveng: Opened %s for output' % file_name
+                print('gr-reveng: Opened %s for output' % file_name)
             except (OSError, IOError) as e:
-                print "Couldn't open file for writing"
-                print str(e)
+                print("Couldn't open file for writing")
+                print(str(e))
 
         self.start_time = datetime.now()
 
@@ -127,15 +127,14 @@ class pattern_dump(gr.sync_block):
                     output = self.format_output(output)
 
                     if self.stdout:
-                        print output
+                        print(output)
 
                     if self.fp:
                         try:
                             self.fp.write(output + '\n')
                             self.fp.flush()
                         except IOError as e:
-                            print 'Error while writing to file:',
-                            print str(e)
+                            print('Error while writing to file: %s' % str(e))
                             self.fp.close()
                             self.fp = None
 
@@ -148,7 +147,7 @@ class pattern_dump(gr.sync_block):
 
     def stop(self):
         if self.fp:
-            print "gr-reveng: Closing %s" % (self.file_name)
+            print("gr-reveng: Closing %s" % (self.file_name))
             self.fp.close()
             self.fp = None
 

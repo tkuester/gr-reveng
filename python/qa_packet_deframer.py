@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # 
 # Copyright 2017 <+YOU OR YOUR COMPANY+>.
@@ -34,6 +34,8 @@ class qa_packet_deframer (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
+        self.sync = list(map(int, bin(0xd391)[2:].zfill(16)))
+        self.plen = list(map(int, bin(4)[2:].zfill(8)))
 
     def tearDown (self):
         self.tb = None
@@ -41,12 +43,11 @@ class qa_packet_deframer (gr_unittest.TestCase):
     def test_001_t (self):
         ''' Test fixed length packet '''
         # set up fg
-        sync = map(int, bin(0xd391)[2:].zfill(16))
-        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
-        stream = ([0] * 30) + sync + data + ([0] * 30)
+        data = list(map(int, bin(0xdeadbeef)[2:].zfill(32)))
+        stream = ([0] * 30) + self.sync + data + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, True, len(data), 0, 0, 0, False)
+        test_blk = reveng.packet_deframer('boop', self.sync, True, len(data), 0, 0, 0, False)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -54,13 +55,13 @@ class qa_packet_deframer (gr_unittest.TestCase):
         self.tb.run()
 
         # check data
-        rec_msg = pmt.to_python(sink.get_message(0))
+        msg = sink.get_message(0)
+        self.assertTrue(pmt.is_pair(msg))
+        meta = pmt.to_python(pmt.car(msg))
+        bits = pmt.to_python(pmt.cdr(msg))
 
-        self.assertTrue(isinstance(rec_msg, tuple))
-        self.assertTrue(len(rec_msg) == 2)
-
-        (meta, bits) = rec_msg
         self.assertTrue(isinstance(meta, dict))
+        bits = pmt.to_python(pmt.cdr(msg))
         self.assertTrue(isinstance(bits, numpy.ndarray))
         self.assertTrue(list(bits) == data)
 
@@ -70,15 +71,13 @@ class qa_packet_deframer (gr_unittest.TestCase):
         additional bytes.
         '''
         # set up fg
-        sync = map(int, bin(0xd391)[2:].zfill(16))
-        plen = map(int, bin(4)[2:].zfill(8))
-        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
+        data = list(map(int, bin(0xdeadbeef)[2:].zfill(32)))
 
-        pkt = plen + data
-        stream = ([0] * 30) + sync + pkt + ([0] * 30)
+        pkt = self.plen + data
+        stream = ([0] * 30) + self.sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 0, 0, False)
+        test_blk = reveng.packet_deframer('boop', self.sync, False, 0, 0, 0, 0, False)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -86,12 +85,11 @@ class qa_packet_deframer (gr_unittest.TestCase):
         self.tb.run()
 
         # check data
-        rec_msg = pmt.to_python(sink.get_message(0))
+        msg = sink.get_message(0)
+        self.assertTrue(pmt.is_pair(msg))
+        meta = pmt.to_python(pmt.car(msg))
+        bits = pmt.to_python(pmt.cdr(msg))
 
-        self.assertTrue(isinstance(rec_msg, tuple))
-        self.assertTrue(len(rec_msg) == 2)
-
-        (meta, bits) = rec_msg
         self.assertTrue(isinstance(meta, dict))
         self.assertTrue(meta.get('name') == "boop")
 
@@ -104,16 +102,14 @@ class qa_packet_deframer (gr_unittest.TestCase):
         after data packet
         '''
         # set up fg
-        sync = map(int, bin(0xd391)[2:].zfill(16))
-        plen = map(int, bin(4)[2:].zfill(8))
-        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
-        csum = map(int, bin(0xa55a)[2:].zfill(16))
+        data = list(map(int, bin(0xdeadbeef)[2:].zfill(32)))
+        csum = list(map(int, bin(0xa55a)[2:].zfill(16)))
 
-        pkt = plen + data + csum
-        stream = ([0] * 30) + sync + pkt + ([0] * 30)
+        pkt = self.plen + data + csum
+        stream = ([0] * 30) + self.sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 0, 2, False)
+        test_blk = reveng.packet_deframer('boop', self.sync, False, 0, 0, 0, 2, False)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -121,12 +117,11 @@ class qa_packet_deframer (gr_unittest.TestCase):
         self.tb.run()
 
         # check data
-        rec_msg = pmt.to_python(sink.get_message(0))
+        msg = sink.get_message(0)
+        self.assertTrue(pmt.is_pair(msg))
+        meta = pmt.to_python(pmt.car(msg))
+        bits = pmt.to_python(pmt.cdr(msg))
 
-        self.assertTrue(isinstance(rec_msg, tuple))
-        self.assertTrue(len(rec_msg) == 2)
-
-        (meta, bits) = rec_msg
         self.assertTrue(isinstance(meta, dict))
         self.assertTrue(isinstance(bits, numpy.ndarray))
         self.assertTrue(list(bits) == pkt)
@@ -137,17 +132,15 @@ class qa_packet_deframer (gr_unittest.TestCase):
         sync. Two additional bytes for checksum after data packet.
         '''
         # set up fg
-        sync = map(int, bin(0xd391)[2:].zfill(16))
-        txid = map(int, bin(0x0001)[2:].zfill(16))
-        plen = map(int, bin(4)[2:].zfill(8))
-        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
-        csum = map(int, bin(0xa55a)[2:].zfill(16))
+        txid = list(map(int, bin(0x0001)[2:].zfill(16)))
+        data = list(map(int, bin(0xdeadbeef)[2:].zfill(32)))
+        csum = list(map(int, bin(0xa55a)[2:].zfill(16)))
 
-        pkt = txid + plen + data + csum
-        stream = ([0] * 30) + sync + pkt + ([0] * 30)
+        pkt = txid + self.plen + data + csum
+        stream = ([0] * 30) + self.sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 2, 2, False)
+        test_blk = reveng.packet_deframer('boop', self.sync, False, 0, 0, 2, 2, False)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -155,12 +148,11 @@ class qa_packet_deframer (gr_unittest.TestCase):
         self.tb.run()
 
         # check data
-        rec_msg = pmt.to_python(sink.get_message(0))
+        msg = sink.get_message(0)
+        self.assertTrue(pmt.is_pair(msg))
+        meta = pmt.to_python(pmt.car(msg))
+        bits = pmt.to_python(pmt.cdr(msg))
 
-        self.assertTrue(isinstance(rec_msg, tuple))
-        self.assertTrue(len(rec_msg) == 2)
-
-        (meta, bits) = rec_msg
         self.assertTrue(isinstance(meta, dict))
         self.assertTrue(isinstance(bits, numpy.ndarray))
         self.assertTrue(list(bits) == pkt)
@@ -171,30 +163,27 @@ class qa_packet_deframer (gr_unittest.TestCase):
         byte after sync. Two additional bytes for checksum after data packet.
         '''
         # set up fg
-        sync = map(int, bin(0xd391)[2:].zfill(16))
-        txid = map(int, bin(0x0001)[2:].zfill(16))
-        plen = map(int, bin(4)[2:].zfill(8))
-        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
-        csum = map(int, bin(0xa55a)[2:].zfill(16))
+        txid = list(map(int, bin(0x0001)[2:].zfill(16)))
+        data = list(map(int, bin(0xdeadbeef)[2:].zfill(32)))
+        csum = list(map(int, bin(0xa55a)[2:].zfill(16)))
 
-        pkt = txid + plen + data + csum
-        stream = ([0] * 30) + sync + pkt + sync + pkt + ([0] * 30)
+        pkt = txid + self.plen + data + csum
+        stream = ([0] * 30) + self.sync + pkt + self.sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 2, 2, False)
+        test_blk = reveng.packet_deframer('boop', self.sync, False, 0, 0, 2, 2, False)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
         self.tb.msg_connect(test_blk, 'out', sink, 'store')
         self.tb.run()
 
-        for idx in xrange(2):
-            rec_msg = pmt.to_python(sink.get_message(idx))
+        for idx in range(2):
+            msg = sink.get_message(0)
+            self.assertTrue(pmt.is_pair(msg))
+            meta = pmt.to_python(pmt.car(msg))
+            bits = pmt.to_python(pmt.cdr(msg))
 
-            self.assertTrue(isinstance(rec_msg, tuple))
-            self.assertTrue(len(rec_msg) == 2)
-
-            (meta, bits) = rec_msg
             self.assertTrue(isinstance(meta, dict))
             self.assertTrue(isinstance(bits, numpy.ndarray))
             self.assertTrue(list(bits) == pkt)
@@ -202,12 +191,11 @@ class qa_packet_deframer (gr_unittest.TestCase):
     def test_006_t (self):
         ''' Test fixed length packet '''
         # set up fg
-        sync = map(int, bin(0xd391)[2:].zfill(16))
-        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
-        stream = ([0] * 30) + sync + data + ([0] * 30)
+        data = list(map(int, bin(0xdeadbeef)[2:].zfill(32)))
+        stream = ([0] * 30) + self.sync + data + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, True, len(data), 0, 0, 0, True)
+        test_blk = reveng.packet_deframer('boop', self.sync, True, len(data), 0, 0, 0, True)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -215,12 +203,11 @@ class qa_packet_deframer (gr_unittest.TestCase):
         self.tb.run()
 
         # check data
-        rec_msg = pmt.to_python(sink.get_message(0))
+        msg = sink.get_message(0)
+        self.assertTrue(pmt.is_pair(msg))
+        meta = pmt.to_python(pmt.car(msg))
+        bytez = pmt.to_python(pmt.cdr(msg))
 
-        self.assertTrue(isinstance(rec_msg, tuple))
-        self.assertTrue(len(rec_msg) == 2)
-
-        (meta, bytez) = rec_msg
         self.assertTrue(isinstance(meta, dict))
         self.assertTrue(isinstance(bytez, numpy.ndarray))
         self.assertTrue(list(bytez) == [0xde, 0xad, 0xbe, 0xef])
@@ -231,15 +218,13 @@ class qa_packet_deframer (gr_unittest.TestCase):
         additional bytes.
         '''
         # set up fg
-        sync = map(int, bin(0xd391)[2:].zfill(16))
-        plen = map(int, bin(4)[2:].zfill(8))
-        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
+        data = list(map(int, bin(0xdeadbeef)[2:].zfill(32)))
 
-        pkt = plen + data
-        stream = ([0] * 30) + sync + pkt + ([0] * 30)
+        pkt = self.plen + data
+        stream = ([0] * 30) + self.sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 0, 0, True)
+        test_blk = reveng.packet_deframer('boop', self.sync, False, 0, 0, 0, 0, True)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -247,12 +232,11 @@ class qa_packet_deframer (gr_unittest.TestCase):
         self.tb.run()
 
         # check data
-        rec_msg = pmt.to_python(sink.get_message(0))
+        msg = sink.get_message(0)
+        self.assertTrue(pmt.is_pair(msg))
+        meta = pmt.to_python(pmt.car(msg))
+        bytez = pmt.to_python(pmt.cdr(msg))
 
-        self.assertTrue(isinstance(rec_msg, tuple))
-        self.assertTrue(len(rec_msg) == 2)
-
-        (meta, bytez) = rec_msg
         self.assertTrue(isinstance(meta, dict))
         self.assertTrue(meta.get('name') == "boop")
 
@@ -265,16 +249,14 @@ class qa_packet_deframer (gr_unittest.TestCase):
         after data packet
         '''
         # set up fg
-        sync = map(int, bin(0xd391)[2:].zfill(16))
-        plen = map(int, bin(4)[2:].zfill(8))
-        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
-        csum = map(int, bin(0xa55a)[2:].zfill(16))
+        data = list(map(int, bin(0xdeadbeef)[2:].zfill(32)))
+        csum = list(map(int, bin(0xa55a)[2:].zfill(16)))
 
-        pkt = plen + data + csum
-        stream = ([0] * 30) + sync + pkt + ([0] * 30)
+        pkt = self.plen + data + csum
+        stream = ([0] * 30) + self.sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 0, 2, True)
+        test_blk = reveng.packet_deframer('boop', self.sync, False, 0, 0, 0, 2, True)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -282,12 +264,11 @@ class qa_packet_deframer (gr_unittest.TestCase):
         self.tb.run()
 
         # check data
-        rec_msg = pmt.to_python(sink.get_message(0))
+        msg = sink.get_message(0)
+        self.assertTrue(pmt.is_pair(msg))
+        meta = pmt.to_python(pmt.car(msg))
+        bytez = pmt.to_python(pmt.cdr(msg))
 
-        self.assertTrue(isinstance(rec_msg, tuple))
-        self.assertTrue(len(rec_msg) == 2)
-
-        (meta, bytez) = rec_msg
         self.assertTrue(isinstance(meta, dict))
         self.assertTrue(isinstance(bytez, numpy.ndarray))
         self.assertTrue(list(bytez) == [0x04, 0xde, 0xad, 0xbe, 0xef, 0xa5, 0x5a])
@@ -298,17 +279,15 @@ class qa_packet_deframer (gr_unittest.TestCase):
         sync. Two additional bytes for checksum after data packet.
         '''
         # set up fg
-        sync = map(int, bin(0xd391)[2:].zfill(16))
-        txid = map(int, bin(0x0001)[2:].zfill(16))
-        plen = map(int, bin(4)[2:].zfill(8))
-        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
-        csum = map(int, bin(0xa55a)[2:].zfill(16))
+        txid = list(map(int, bin(0x0001)[2:].zfill(16)))
+        data = list(map(int, bin(0xdeadbeef)[2:].zfill(32)))
+        csum = list(map(int, bin(0xa55a)[2:].zfill(16)))
 
-        pkt = txid + plen + data + csum
-        stream = ([0] * 30) + sync + pkt + ([0] * 30)
+        pkt = txid + self.plen + data + csum
+        stream = ([0] * 30) + self.sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 2, 2, True)
+        test_blk = reveng.packet_deframer('boop', self.sync, False, 0, 0, 2, 2, True)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
@@ -316,12 +295,11 @@ class qa_packet_deframer (gr_unittest.TestCase):
         self.tb.run()
 
         # check data
-        rec_msg = pmt.to_python(sink.get_message(0))
+        msg = sink.get_message(0)
+        self.assertTrue(pmt.is_pair(msg))
+        meta = pmt.to_python(pmt.car(msg))
+        bytez = pmt.to_python(pmt.cdr(msg))
 
-        self.assertTrue(isinstance(rec_msg, tuple))
-        self.assertTrue(len(rec_msg) == 2)
-
-        (meta, bytez) = rec_msg
         self.assertTrue(isinstance(meta, dict))
         self.assertTrue(isinstance(bytez, numpy.ndarray))
         self.assertTrue(list(bytez) == [0x00, 0x01, 0x04, 0xde, 0xad, 0xbe, 0xef, 0xa5, 0x5a])
@@ -332,30 +310,27 @@ class qa_packet_deframer (gr_unittest.TestCase):
         byte after sync. Two additional bytes for checksum after data packet.
         '''
         # set up fg
-        sync = map(int, bin(0xd391)[2:].zfill(16))
-        txid = map(int, bin(0x0001)[2:].zfill(16))
-        plen = map(int, bin(4)[2:].zfill(8))
-        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
-        csum = map(int, bin(0xa55a)[2:].zfill(16))
+        txid = list(map(int, bin(0x0001)[2:].zfill(16)))
+        data = list(map(int, bin(0xdeadbeef)[2:].zfill(32)))
+        csum = list(map(int, bin(0xa55a)[2:].zfill(16)))
 
-        pkt = txid + plen + data + csum
-        stream = ([0] * 30) + sync + pkt + sync + pkt + ([0] * 30)
+        pkt = txid + self.plen + data + csum
+        stream = ([0] * 30) + self.sync + pkt + self.sync + pkt + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 0, 2, 2, True)
+        test_blk = reveng.packet_deframer('boop', self.sync, False, 0, 0, 2, 2, True)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
         self.tb.msg_connect(test_blk, 'out', sink, 'store')
         self.tb.run()
 
-        for idx in xrange(2):
-            rec_msg = pmt.to_python(sink.get_message(idx))
+        for idx in range(2):
+            msg = sink.get_message(0)
+            self.assertTrue(pmt.is_pair(msg))
+            meta = pmt.to_python(pmt.car(msg))
+            bytez = pmt.to_python(pmt.cdr(msg))
 
-            self.assertTrue(isinstance(rec_msg, tuple))
-            self.assertTrue(len(rec_msg) == 2)
-
-            (meta, bytez) = rec_msg
             self.assertTrue(isinstance(meta, dict))
             self.assertTrue(isinstance(bytez, numpy.ndarray))
             self.assertTrue(list(bytez) == [0x00, 0x01, 0x04, 0xde, 0xad, 0xbe, 0xef, 0xa5, 0x5a])
@@ -367,32 +342,29 @@ class qa_packet_deframer (gr_unittest.TestCase):
         byte after sync. Two additional bytes for checksum after data packet.
         '''
         # set up fg
-        sync = map(int, bin(0xd391)[2:].zfill(16))
-        txid = map(int, bin(0x0001)[2:].zfill(16))
-        p_bad_len = map(int, bin(99)[2:].zfill(8))
-        plen = map(int, bin(4)[2:].zfill(8))
-        data = map(int, bin(0xdeadbeef)[2:].zfill(32))
-        csum = map(int, bin(0xa55a)[2:].zfill(16))
+        txid = list(map(int, bin(0x0001)[2:].zfill(16)))
+        p_bad_len = list(map(int, bin(99)[2:].zfill(8)))
+        data = list(map(int, bin(0xdeadbeef)[2:].zfill(32)))
+        csum = list(map(int, bin(0xa55a)[2:].zfill(16)))
 
         pkt1 = txid + p_bad_len + data + csum
-        pkt2 = txid + plen + data + csum
+        pkt2 = txid + self.plen + data + csum
 
-        stream = ([0] * 30) + sync + pkt1 + sync + pkt2 + ([0] * 30)
+        stream = ([0] * 30) + self.sync + pkt1 + self.sync + pkt2 + ([0] * 30)
 
         src = blocks.vector_source_b(stream)
-        test_blk = reveng.packet_deframer('boop', sync, False, 0, 4, 2, 2, True)
+        test_blk = reveng.packet_deframer('boop', self.sync, False, 0, 4, 2, 2, True)
         sink = blocks.message_debug()
 
         self.tb.connect(src, test_blk)
         self.tb.msg_connect(test_blk, 'out', sink, 'store')
         self.tb.run()
 
-        rec_msg = pmt.to_python(sink.get_message(0))
+        msg = sink.get_message(0)
+        self.assertTrue(pmt.is_pair(msg))
+        meta = pmt.to_python(pmt.car(msg))
+        bytez = pmt.to_python(pmt.cdr(msg))
 
-        self.assertTrue(isinstance(rec_msg, tuple))
-        self.assertTrue(len(rec_msg) == 2)
-
-        (meta, bytez) = rec_msg
         self.assertTrue(isinstance(meta, dict))
         self.assertTrue(isinstance(bytez, numpy.ndarray))
         self.assertTrue(list(bytez) == [0x00, 0x01, 0x04, 0xde, 0xad, 0xbe, 0xef, 0xa5, 0x5a])
@@ -404,4 +376,4 @@ class qa_packet_deframer (gr_unittest.TestCase):
             pass
 
 if __name__ == '__main__':
-    gr_unittest.run(qa_packet_deframer, "qa_packet_deframer.xml")
+    gr_unittest.run(qa_packet_deframer)
