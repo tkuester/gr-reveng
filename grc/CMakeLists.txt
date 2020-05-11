@@ -18,7 +18,7 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    reveng_pattern_dump.xml
-    reveng_packet_deframer.xml
-    reveng_packet_formatter.xml DESTINATION share/gnuradio/grc/blocks
+    reveng_pattern_dump.block.yml
+    reveng_packet_deframer.block.yml
+    reveng_packet_formatter.block.yml DESTINATION share/gnuradio/grc/blocks
 )
