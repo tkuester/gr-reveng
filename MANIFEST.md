@@ -1,14 +1,22 @@
 title: The REVENG OOT Module
-brief: Short description of gr-reveng
-tags: # Tags are arbitrary, but look at CGRAN what other authors are using
+brief: Looks for sync words in a stream, converts to packets
+tags:
+  - sdr
   - packet
-  - reverse engineering
 author:
-  - Tim Kuester <tkuester@users.noreply.github.com>
+  - Tim Kuester <tkuester@2n3904.net>
 copyright_owner:
   - Tim Kuester
-license: MIT
+license:
+gr_supported_version: 3.8.1.0
 repo: https://github.com/tkuester/gr-reveng
-#website: <module_website> # If you have a separate project website, put it here
-#icon: <icon_url> # Put a URL to a square image here that will be used as an icon on CGRAN
 ---
+GNU Radio has excellent tools for processing streams of samples, and some tools
+for processing packets. However, there aren't many tools for crossing the
+boundary between samples and packets.
+
+**gr-reveng** was originally written to reverse engineer small ISM band
+devices. While other solutions like
+[inspectrum](https://github.com/miek/inspectrum) are MUCH better suited towards
+reverse engineering, **gr-reveng** fills a necessary gap for quickly
+prototyping receivers that work in realtime.
