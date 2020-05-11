@@ -26,7 +26,7 @@ description here (python/__init__.py).
 # import swig generated symbols into the reveng namespace
 try:
 	# this might fail if the module is python-only
-	from reveng_swig import *
+	from .reveng_swig import *
 except ImportError:
 	pass
 
