@@ -160,7 +160,7 @@ class packet_formatter(gr.basic_block):
             if tipe == 'name':
                 tmp = meta.get('name', "None")
             elif tipe == 'ts':
-                tmp = '%.6f' % meta.get('ts', -1)
+                tmp = '%d.%06d' % (meta.get('tv_sec', -1), meta.get('tv_usec', -1))
             elif tipe == 'bits':
                 tmp = ''.join(map(str, sub_bits))
             elif tipe == 'hex':

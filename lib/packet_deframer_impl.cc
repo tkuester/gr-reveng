@@ -164,10 +164,11 @@ namespace gr {
                   // TODO: Pull the timestamp from the stream tags, if possible.
                   // Real time doesn't necessarily correspond to when we rx the samp buffer
                   if(gettimeofday(&tv, NULL) == 0) {
-                      ts = tv.tv_sec + (tv.tv_usec / 100000.0);
-                      meta = pmt::dict_add(meta, pmt::mp("ts"), pmt::from_double(ts));
+                      meta = pmt::dict_add(meta, pmt::mp("tv_sec"), pmt::from_long(tv.tv_sec));
+                      meta = pmt::dict_add(meta, pmt::mp("tv_usec"), pmt::from_long(tv.tv_usec));
                   } else {
-                      meta = pmt::dict_add(meta, pmt::mp("ts"), pmt::from_double(-1));
+                      meta = pmt::dict_add(meta, pmt::mp("tv_sec"), pmt::from_long(-1));
+                      meta = pmt::dict_add(meta, pmt::mp("tv_usec"), pmt::from_long(-1));
                   }
 
                   // FIXME: Does this not work in all cases?
